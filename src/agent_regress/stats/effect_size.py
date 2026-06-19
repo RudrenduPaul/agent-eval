@@ -6,6 +6,12 @@ from dataclasses import dataclass
 
 import numpy as np
 
+_INTERPRETATION_THRESHOLDS: tuple[tuple[float, str], ...] = (
+    (0.2, "negligible"),
+    (0.5, "small"),
+    (0.8, "medium"),
+)
+
 
 @dataclass(frozen=True)
 class EffectSizeResult:
@@ -14,11 +20,15 @@ class EffectSizeResult:
     interpretation: str
 
 
-def cohens_d(scores_a: list[float], scores_b: list[float]) -> float:
+def _require_nonempty(scores_a: list[float], scores_b: list[float]) -> None:
     if not scores_a:
         raise ValueError("scores_a must not be empty")
     if not scores_b:
         raise ValueError("scores_b must not be empty")
+
+
+def cohens_d(scores_a: list[float], scores_b: list[float]) -> float:
+    _require_nonempty(scores_a, scores_b)
 
     arr_a = np.asarray(scores_a, dtype=np.float64)
     arr_b = np.asarray(scores_b, dtype=np.float64)
@@ -39,10 +49,7 @@ def cohens_d(scores_a: list[float], scores_b: list[float]) -> float:
 
 
 def rank_biserial_r(scores_a: list[float], scores_b: list[float]) -> float:
-    if not scores_a:
-        raise ValueError("scores_a must not be empty")
-    if not scores_b:
-        raise ValueError("scores_b must not be empty")
+    _require_nonempty(scores_a, scores_b)
 
     n_a, n_b = len(scores_a), len(scores_b)
     arr_a = np.asarray(scores_a, dtype=np.float64)
@@ -54,12 +61,9 @@ def rank_biserial_r(scores_a: list[float], scores_b: list[float]) -> float:
 
 def interpret_cohens_d(d: float) -> str:
     abs_d = abs(d)
-    if abs_d < 0.2:
-        return "negligible"
-    elif abs_d < 0.5:
-        return "small"
-    elif abs_d < 0.8:
-        return "medium"
+    for threshold, label in _INTERPRETATION_THRESHOLDS:
+        if abs_d < threshold:
+            return label
     return "large"
 
 

@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 
+_SEPARATOR = "=" * 60
+_NEAR_ZERO_THRESHOLD = 0.001
+
 
 class Verdict(str, Enum):
     REGRESSED = "REGRESSED"
@@ -39,9 +42,12 @@ class Report:
             return
         is_regression = self.p_value < p_threshold and self.effect_size < -min_effect
         if is_regression:
-            pct = f"{abs(self.mean_delta) / max(self.mean_a, 1e-9):.1%}"
+            if self.mean_a >= _NEAR_ZERO_THRESHOLD:
+                drop = f"{abs(self.mean_delta) / self.mean_a:.1%}"
+            else:
+                drop = f"{abs(self.mean_delta):.4f} (absolute)"
             raise AssertionError(
-                f"REGRESSED: {self.metric} dropped {pct} "
+                f"REGRESSED: {self.metric} dropped {drop} "
                 f"(p={self.p_value:.3f}, Cohen's d={self.effect_size:.2f}, "
                 f"95% CI [{self.ci_lower:.3f}, {self.ci_upper:.3f}])\n"
                 f"Version A: {self.mean_a:.3f} +/- {self.std_a:.3f} (n={self.n_a})\n"
@@ -49,12 +55,11 @@ class Report:
             )
 
     def __str__(self) -> str:
-        sep = "=" * 60
         lines = [
             "",
-            sep,
+            _SEPARATOR,
             f"agentregress Report -- {self.metric}",
-            sep,
+            _SEPARATOR,
             f"Verdict:    {self.verdict.value}",
             f"p-value:    {self.p_value:.4f}",
             f"Cohen's d:  {self.effect_size:.3f}",
@@ -66,5 +71,5 @@ class Report:
         ]
         if self.warnings:
             lines += ["", "Warnings:"] + [f"  ! {w}" for w in self.warnings]
-        lines.append(sep)
+        lines.append(_SEPARATOR)
         return "\n".join(lines)

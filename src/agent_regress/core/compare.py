@@ -68,7 +68,7 @@ def compare(  # noqa: PLR0913
         warn_msgs.append(msg)
         warnings.warn(msg, UserWarning, stacklevel=2)
 
-    mw = mann_whitney_u(scores_a, scores_b)
+    mw = mann_whitney_u(scores_a, scores_b, _warn=False)
     ci = bootstrap_mean_ci(scores_a, scores_b, n_resamples=n_bootstrap)
     d = cohens_d(scores_a, scores_b)
 

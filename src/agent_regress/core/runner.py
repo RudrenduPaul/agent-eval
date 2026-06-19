@@ -37,26 +37,27 @@ def run_suite(
             stacklevel=2,
         )
 
+    def _to_score(raw: Any, test_case: dict[str, Any]) -> float:
+        if scorer is not None:
+            return float(scorer(raw, test_case))
+        if isinstance(raw, (int, float)):
+            return float(raw)
+        raise TypeError(
+            f"Agent returned {type(raw).__name__!r}. "
+            "Either return a float directly or pass "
+            "scorer= to convert output to float."
+        )
+
     def _run_case(test_case: dict[str, Any]) -> list[float]:
         case_scores: list[float] = []
         for _ in range(n_runs):
-            raw = agent(test_case)
-            if scorer is not None:
-                score = float(scorer(raw, test_case))
-            elif isinstance(raw, (int, float)):
-                score = float(raw)
-            else:
-                raise TypeError(
-                    f"Agent returned {type(raw).__name__!r}. "
-                    "Either return a float directly or pass "
-                    "scorer= to convert output to float."
-                )
+            score = _to_score(agent(test_case), test_case)
             if not (0.0 <= score <= 1.0):
                 warnings.warn(
                     f"Score {score:.4f} outside [0.0, 1.0]. Clamping. "
                     "Ensure your scorer returns values in [0.0, 1.0].",
                     UserWarning,
-                    stacklevel=3,
+                    stacklevel=2,
                 )
                 score = max(0.0, min(1.0, score))
             case_scores.append(score)

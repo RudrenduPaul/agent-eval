@@ -18,7 +18,8 @@ def assert_no_regression(
     p_threshold: float = 0.05,
     min_effect: float = 0.2,
 ) -> None:
-    if report.n_a < _MIN_N_WARNING or report.n_b < _MIN_N_WARNING:
+    insufficient_n = report.n_a < _MIN_N_WARNING or report.n_b < _MIN_N_WARNING
+    if insufficient_n:
         warnings.warn(
             f"n_a={report.n_a}, n_b={report.n_b}: insufficient sample size for "
             "reliable regression detection. Not failing the build due to "
