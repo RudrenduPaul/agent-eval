@@ -1,0 +1,30 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: to-reproduce
+    attributes:
+      label: Minimal reproduction
+      render: python
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: agent-regress version
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+    validations:
+      required: true

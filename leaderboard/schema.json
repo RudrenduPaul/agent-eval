@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "agentregress Leaderboard Submission",
+  "type": "object",
+  "required": ["model_name", "framework", "submitted_by", "submitted_date", "reproduction_command"],
+  "properties": {
+    "model_name": {"type": "string"},
+    "framework": {"type": "string"},
+    "submitted_by": {"type": "string"},
+    "submitted_date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "reproduction_command": {"type": "string"},
+    "tau_bench": {
+      "type": "object",
+      "properties": {
+        "pass_at_1": {"type": "number", "minimum": 0, "maximum": 1},
+        "pass_at_4": {"type": "number", "minimum": 0, "maximum": 1},
+        "pass_at_8": {"type": "number", "minimum": 0, "maximum": 1},
+        "dataset": {"type": "string"},
+        "n_tasks": {"type": "integer", "minimum": 1}
+      }
+    },
+    "gaia": {
+      "type": "object",
+      "properties": {
+        "level_1_accuracy": {"type": "number", "minimum": 0, "maximum": 1},
+        "level_2_accuracy": {"type": "number", "minimum": 0, "maximum": 1},
+        "level_3_accuracy": {"type": "number", "minimum": 0, "maximum": 1},
+        "n_questions": {"type": "integer", "minimum": 1}
+      }
+    },
+    "swebench": {
+      "type": "object",
+      "properties": {
+        "scaffold_pass_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "n_instances": {"type": "integer", "minimum": 1}
+      }
+    },
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}

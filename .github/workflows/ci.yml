@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Lint
+        run: uv run ruff check src/ tests/ benchmarks/
+
+      - name: Format check
+        run: uv run ruff format --check src/ tests/ benchmarks/
+
+      - name: Type check
+        run: uv run mypy src/ --strict
+
+      - name: Unit tests with coverage
+        run: |
+          uv run pytest tests/unit/ \
+            --cov=src/ \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under=80 \
+            -v
+
+      - name: Stats module coverage gate (95%)
+        run: |
+          uv run pytest tests/unit/stats/ \
+            --cov=src/agent_regress/stats/ \
+            --cov-fail-under=95 \
+            -q
+
+      - name: Security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          format: sarif
+          output: trivy-results.sarif
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+
+      - name: Upload Trivy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+  leaderboard-schema:
+    name: Validate leaderboard schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync --extra dev
+      - name: Validate submissions
+        run: |
+          python -c "
+          import json, jsonschema, pathlib, sys
+          schema_path = pathlib.Path('leaderboard/schema.json')
+          if not schema_path.exists():
+              sys.exit(0)
+          schema = json.loads(schema_path.read_text())
+          results_dir = pathlib.Path('leaderboard/results')
+          json_files = [f for f in results_dir.glob('*.json') if f.name != '.gitkeep']
+          if not json_files:
+              print('No leaderboard results to validate')
+              sys.exit(0)
+          for f in json_files:
+              jsonschema.validate(json.loads(f.read_text()), schema)
+              print(f'OK: {f.name}')
+          "

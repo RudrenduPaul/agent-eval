@@ -1,0 +1,16 @@
+{
+  "generated": "2026-06-19",
+  "note": "Baseline from mock agents. Replace with real agent results.",
+  "stat_overhead_ms": {
+    "mann_whitney_n50": "<1",
+    "mann_whitney_n1000": "<5",
+    "bootstrap_n50_1000resamples": "<10",
+    "bootstrap_n1000_1000resamples": "<50",
+    "full_compare_overhead_n1000": "<60"
+  },
+  "environment": {
+    "python": "3.12",
+    "scipy": ">=1.13",
+    "numpy": ">=1.26"
+  }
+}
