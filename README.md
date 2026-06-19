@@ -2,6 +2,12 @@
 
 **Statistical regression testing for LLM agents.** Run your agent 50 times on a fixed test suite at version A, 50 times at version B, and get a p-value on whether behavior actually changed -- not just whether the score looks different.
 
+<!-- DEMO GIF: terminal showing two agent runs across 50 test cases. Version A baseline runs.
+     Version B runs. agentregress compare prints the structured output: metric name, p-value,
+     Cohen's d, CI, verdict REGRESSED. 8-10 seconds. No logo, no music, just the terminal.
+     Record with: uv run python examples/01-basic-comparison/example.py and capture via asciinema.
+     Replace this comment with: ![agentregress demo](docs/demo.gif) when ready. -->
+
 [![PyPI](https://img.shields.io/pypi/v/agent-regress)](https://pypi.org/project/agent-regress/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/RudrenduPaul/agentregress/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agentregress/actions/workflows/ci.yml)
@@ -275,6 +281,24 @@ See [leaderboard/README.md](leaderboard/README.md).
 GitHub Discussions for design questions. Discord for community: discord.gg/agentregress
 
 Apache 2.0. Contributions welcome.
+
+---
+
+## Cite this work
+
+If you use agentregress in research, please cite:
+
+```bibtex
+@software{paul2026agentregress,
+  author = {Paul, Rudrendu and Nandy, Sourav},
+  title = {agentregress: Statistical Regression Testing for LLM Agents},
+  year = {2026},
+  url = {https://github.com/RudrenduPaul/agentregress},
+  license = {Apache-2.0}
+}
+```
+
+Methodology pre-print: [docs/arxiv-preprint-draft.md](docs/arxiv-preprint-draft.md) (arXiv submission pending).
 
 ---
 
