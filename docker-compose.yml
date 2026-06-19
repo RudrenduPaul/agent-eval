@@ -4,14 +4,11 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - agentregress-data:/data
-    environment:
-      - AGENTREGRESS_DATA_DIR=/data
     command: >
-      sh -c "pip install -e . && python -m http.server 8080"
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
-
-volumes:
-  agentregress-data:
+      sh -c "
+        pip install uv --quiet &&
+        uv sync --extra dev --quiet &&
+        uv run python examples/01-basic-comparison/example.py
+      "
+    environment:
+      - PYTHONUNBUFFERED=1

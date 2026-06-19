@@ -236,15 +236,15 @@ See [leaderboard/README.md](leaderboard/README.md) to submit results.
 
 ---
 
-## Self-host
+## Try it in Docker
 
 ```bash
 git clone https://github.com/RudrenduPaul/agentregress
 cd agentregress
-docker compose up -d
+docker compose up
 ```
 
-Opens at `http://localhost:8080`. No account, no API key, no telemetry.
+Runs the basic comparison example inside a container, no local Python setup needed. Good for verifying the install works before wiring it into your own agent.
 
 ---
 

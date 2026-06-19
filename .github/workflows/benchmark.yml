@@ -20,7 +20,7 @@ jobs:
             --benchmark-json=output.json \
             --benchmark-only \
             -v
-      - uses: benchmark-action/github-action-benchmark@v1
+      - uses: benchmark-action/github-action-benchmark@4de1bed97a47d2e7a675c37e04bcf5f29cb28bdb  # v1.20.4
         with:
           tool: pytest
           output-file-path: output.json
