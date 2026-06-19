@@ -40,11 +40,6 @@ def basic_test_suite() -> list[dict[str, Any]]:
 
 
 @pytest.fixture
-def large_test_suite() -> list[dict[str, Any]]:
-    return [{"query": f"question_{i}", "expected": f"answer_{i}"} for i in range(20)]
-
-
-@pytest.fixture
 def sample_scores_a() -> list[float]:
     rng = random.Random(42)
     return [max(0.0, min(1.0, rng.gauss(0.80, 0.05))) for _ in range(50)]
