@@ -24,7 +24,8 @@ jobs:
       - name: Generate SBOM
         run: |
           pip install cyclonedx-bom
-          cyclonedx-py environment -o sbom.json --format json
+          uv export --no-dev --format requirements-txt -o /tmp/prod-requirements.txt
+          cyclonedx-py requirements --output-format json -o sbom.json /tmp/prod-requirements.txt
       - name: Sign with Sigstore
         uses: sigstore/gh-action-sigstore-python@f514d46b907ebcd5bedc05145c03b69c1edd8b46  # v3.0.0
         with:

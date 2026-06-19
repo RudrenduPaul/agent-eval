@@ -163,6 +163,20 @@ class TestGAIAHarness:
         results = harness.evaluate()
         assert any(r.level == GAIALevel.LEVEL_1 for r in results)
 
+    def test_agent_exception_warns_and_scores_zero(self) -> None:
+        import warnings
+
+        def _raise_agent(tc: dict[str, Any]) -> str:
+            raise RuntimeError("gaia agent crashed")
+
+        harness = GAIAHarness(agent=_raise_agent, dataset=GAIA_DATASET)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            results = harness.evaluate()
+        assert any(issubclass(warning.category, UserWarning) for warning in w)
+        for r in results:
+            assert r.accuracy == pytest.approx(0.0)
+
 
 class TestSWEBenchHarness:
     def test_resolved_agent(self) -> None:

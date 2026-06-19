@@ -54,9 +54,3 @@ def sample_scores_a() -> list[float]:
 def sample_scores_b() -> list[float]:
     rng = random.Random(123)
     return [max(0.0, min(1.0, rng.gauss(0.65, 0.07))) for _ in range(50)]
-
-
-@pytest.fixture
-def stable_scores() -> list[float]:
-    rng = random.Random(42)
-    return [max(0.0, min(1.0, rng.gauss(0.80, 0.05))) for _ in range(50)]
