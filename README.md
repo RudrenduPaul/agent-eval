@@ -90,6 +90,7 @@ report = compare(
     version_b=agent_v2,
     test_suite=test_suite,
     n_runs=50,
+    metric="tool_accuracy",  # use any name except "accuracy" when agents return floats
 )
 
 print(report)           # structured output with p-value, CI, effect size
