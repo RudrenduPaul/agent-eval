@@ -86,6 +86,7 @@ module = [
     "langgraph.*",
     "langchain_core.*",
     "openai.*",
+    "agents.*",
     "crewai.*",
 ]
 ignore_missing_imports = true

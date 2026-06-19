@@ -22,7 +22,7 @@ def openai_agents_runner(agent: Any) -> AgentCallable:
         An AgentCallable suitable for use with compare() or run_suite().
     """
     try:
-        import openai  # noqa: F401, PLC0415  # type: ignore[import-untyped]
+        import agents  # noqa: F401, PLC0415  # type: ignore[import-untyped]
     except ImportError as exc:
         raise ImportError(
             "OpenAI Agents SDK integration requires openai-agents. "
