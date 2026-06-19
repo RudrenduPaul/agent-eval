@@ -92,9 +92,9 @@ The Mann-Whitney U test is distribution-free: it makes no assumption about the f
 
 U = |{(i,j) : b_j > a_i}| + 0.5 × |{(i,j) : b_j = a_i}|
 
-Under H_0 of distributional equivalence, U follows a known distribution (exact for small n, asymptotic normal with tie correction for n > 25). The p-value is P(U >= u_observed | H_0).
+Under H_0 of distributional equivalence, U follows a known distribution (exact for small n, asymptotic normal with tie correction for large n). The p-value is P(U >= u_observed | H_0).
 
-We use `scipy.stats.mannwhitneyu` with `method="auto"` (exact for n < 25 per group, asymptotic otherwise) and `alternative="two-sided"`.
+We use `scipy.stats.mannwhitneyu` with `method="auto"` (exact for n ≤ ~500 per group, asymptotic for n ≥ 1,000) and `alternative="two-sided"`.
 
 **Degenerate case handling:** When all scores in both groups are identical (common in synthetic tests and constant-output agents), scipy returns NaN for the p-value. We return p = 1.0, correctly indicating no evidence of distributional difference.
 
