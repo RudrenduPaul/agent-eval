@@ -32,20 +32,21 @@ class TauBenchHarness:
     dataset: list[dict[str, Any]]
     success_threshold: float = 0.5
 
-    def _run_task_k_times(self, task: dict[str, Any], k: int) -> bool:
-        for _ in range(k):
-            try:
-                result = self.agent(task)
-                score = float(result) if isinstance(result, (int, float)) else 0.0
-                if score >= self.success_threshold:
-                    return True
-            except Exception as exc:
-                warnings.warn(
-                    f"Agent raised exception on task: {exc}",
-                    UserWarning,
-                    stacklevel=3,
-                )
-        return False
+    def _attempt(self, task: dict[str, Any]) -> bool:
+        try:
+            result = self.agent(task)
+            score = float(result) if isinstance(result, (int, float)) else 0.0
+            return score >= self.success_threshold
+        except Exception as exc:
+            warnings.warn(
+                f"Agent raised exception on task: {exc}",
+                UserWarning,
+                stacklevel=2,
+            )
+            return False
+
+    def _run_task_attempts(self, task: dict[str, Any], max_k: int) -> list[bool]:
+        return [self._attempt(task) for _ in range(max_k)]
 
     def evaluate(self, k_values: list[int] | None = None) -> list[TauBenchResult]:
         if k_values is None:
@@ -53,18 +54,23 @@ class TauBenchHarness:
         if not self.dataset:
             raise ValueError("dataset must not be empty")
 
+        max_k = max(k_values)
+        # Run each task max_k times once; derive pass^k by checking first k attempts.
+        per_task_attempts = [
+            self._run_task_attempts(task, max_k) for task in self.dataset
+        ]
+
         results: list[TauBenchResult] = []
-        for k in k_values:
-            task_results = [self._run_task_k_times(task, k) for task in self.dataset]
-            n_success = sum(task_results)
-            task_scores = [1.0 if r else 0.0 for r in task_results]
+        for k in sorted(k_values):
+            task_passed = [any(attempts[:k]) for attempts in per_task_attempts]
+            n_success = sum(task_passed)
             results.append(
                 TauBenchResult(
                     k=k,
                     pass_at_k=n_success / len(self.dataset),
                     n_tasks=len(self.dataset),
                     n_successes=n_success,
-                    task_scores=task_scores,
+                    task_scores=[1.0 if p else 0.0 for p in task_passed],
                 )
             )
         return results

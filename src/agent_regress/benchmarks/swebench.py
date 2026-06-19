@@ -7,8 +7,11 @@ verdict logic) can lift pass rates 5-15pp on the same model.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Any
+
+_RESOLVED_STRINGS: frozenset[str] = frozenset({"resolved", "true", "pass", "1"})
 
 
 @dataclass(frozen=True)
@@ -30,7 +33,7 @@ class SWEBenchHarness:
             return output
         if isinstance(output, (int, float)):
             return float(output) >= 0.5
-        return str(output).strip().lower() in ("resolved", "true", "pass", "1")
+        return str(output).strip().lower() in _RESOLVED_STRINGS
 
     def evaluate(self) -> SWEBenchResult:
         if not self.dataset:
@@ -39,15 +42,19 @@ class SWEBenchHarness:
         resolved_ids: list[str] = []
         all_ids: list[str] = []
 
-        for instance in self.dataset:
-            instance_id = str(instance.get("instance_id", "unknown"))
+        for idx, instance in enumerate(self.dataset):
+            instance_id = str(instance.get("instance_id", f"instance_{idx}"))
             all_ids.append(instance_id)
             try:
                 output = self.agent(instance)
                 if self._is_resolved(output, instance):
                     resolved_ids.append(instance_id)
-            except Exception:  # noqa: S110
-                pass
+            except Exception as exc:
+                warnings.warn(
+                    f"Agent raised exception on {instance_id}: {exc}",
+                    UserWarning,
+                    stacklevel=2,
+                )
 
         return SWEBenchResult(
             scaffold_pass_rate=len(resolved_ids) / len(self.dataset),

@@ -43,7 +43,7 @@ class GAIAHarness:
             raw_level = task.get("level", 1)
             try:
                 level = GAIALevel(int(raw_level))
-            except ValueError:
+            except (ValueError, TypeError):
                 level = GAIALevel.LEVEL_1
             by_level[level].append(task)
 
@@ -52,7 +52,9 @@ class GAIAHarness:
             if not tasks:
                 continue
             correct = sum(
-                1 for task in tasks if self._is_correct(self.agent(task), task)
+                1
+                for task in tasks
+                if self._is_correct(self._safe_run(task), task)
             )
             results.append(
                 GAIALevelResult(
@@ -63,3 +65,9 @@ class GAIAHarness:
                 )
             )
         return sorted(results, key=lambda r: r.level)
+
+    def _safe_run(self, task: dict[str, Any]) -> Any:
+        try:
+            return self.agent(task)
+        except Exception:
+            return None
