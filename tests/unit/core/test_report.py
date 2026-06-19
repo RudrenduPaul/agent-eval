@@ -55,6 +55,22 @@ class TestReport:
         with pytest.raises(AssertionError, match="REGRESSED"):
             report.assert_stable()
 
+    def test_assert_stable_raises_at_exact_min_effect_boundary(self) -> None:
+        # d == -min_effect exactly: compare() labels this REGRESSED;
+        # assert_stable() must be consistent and also raise.
+        report = _make_report(
+            verdict=Verdict.REGRESSED,
+            p_value=0.01,
+            effect_size=-0.2,
+            ci_lower=-0.1,
+            ci_upper=0.0,
+            mean_a=0.9,
+            mean_b=0.7,
+            mean_delta=-0.2,
+        )
+        with pytest.raises(AssertionError, match="REGRESSED"):
+            report.assert_stable(p_threshold=0.05, min_effect=0.2)
+
     def test_improved_does_not_raise(self) -> None:
         report = _make_report(verdict=Verdict.IMPROVED)
         report.assert_stable()

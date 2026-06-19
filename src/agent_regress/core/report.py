@@ -40,7 +40,7 @@ class Report:
     ) -> None:
         if self.verdict == Verdict.INSUFFICIENT_DATA:
             return
-        is_regression = self.p_value < p_threshold and self.effect_size < -min_effect
+        is_regression = self.p_value < p_threshold and self.effect_size <= -min_effect
         if is_regression:
             if self.mean_a >= _NEAR_ZERO_THRESHOLD:
                 drop = f"{abs(self.mean_delta) / self.mean_a:.1%}"
