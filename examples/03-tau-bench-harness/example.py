@@ -2,6 +2,7 @@
 
 Run with: python examples/03-tau-bench-harness/example.py
 """
+
 from __future__ import annotations
 
 import random
@@ -16,10 +17,7 @@ def mock_agent(test_case: dict[str, Any]) -> float:
 
 
 def main() -> None:
-    dataset = [
-        {"task_id": f"retail_task_{i}", "domain": "retail"}
-        for i in range(50)
-    ]
+    dataset = [{"task_id": f"retail_task_{i}", "domain": "retail"} for i in range(50)]
 
     harness = TauBenchHarness(agent=mock_agent, dataset=dataset)
     results = harness.evaluate(k_values=[1, 4, 8])

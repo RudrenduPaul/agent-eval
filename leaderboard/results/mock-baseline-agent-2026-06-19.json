@@ -1,0 +1,25 @@
+{
+  "model_name": "mock-baseline-agent-v1",
+  "framework": "agentregress-native",
+  "submitted_by": "RudrenduPaul",
+  "submitted_date": "2026-06-19",
+  "reproduction_command": "uv run pytest benchmarks/test_tau_bench.py benchmarks/test_gaia.py benchmarks/test_swebench.py -v",
+  "tau_bench": {
+    "pass_at_1": 0.60,
+    "pass_at_4": 0.974,
+    "pass_at_8": 0.9993,
+    "dataset": "tau-bench-retail-mock",
+    "n_tasks": 50
+  },
+  "gaia": {
+    "level_1_accuracy": 0.85,
+    "level_2_accuracy": 0.65,
+    "level_3_accuracy": 0.35,
+    "n_questions": 50
+  },
+  "swebench": {
+    "scaffold_pass_rate": 0.0,
+    "n_instances": 10
+  },
+  "notes": "Baseline submission using the mock agents from the agentregress benchmark harnesses. Not a real model -- establishes the leaderboard data format and validates the schema. Replace with real agent results to participate in the leaderboard."
+}

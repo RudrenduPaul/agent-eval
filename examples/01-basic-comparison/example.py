@@ -2,6 +2,7 @@
 
 Run with: python examples/01-basic-comparison/example.py
 """
+
 from __future__ import annotations
 
 import random

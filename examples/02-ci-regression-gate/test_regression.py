@@ -2,6 +2,7 @@
 
 Run with: pytest examples/02-ci-regression-gate/
 """
+
 from __future__ import annotations
 
 import random
@@ -25,10 +26,7 @@ def _build_agent(base_score: float, noise: float = 0.05, seed: int = 0) -> Any:
 AGENT_V1 = _build_agent(base_score=0.82, seed=0)
 AGENT_V2 = _build_agent(base_score=0.80, seed=999)
 
-TEST_SUITE = [
-    {"query": f"task_{i}", "expected": f"answer_{i}"}
-    for i in range(10)
-]
+TEST_SUITE = [{"query": f"task_{i}", "expected": f"answer_{i}"} for i in range(10)]
 
 
 def test_no_regression() -> None:
@@ -37,7 +35,7 @@ def test_no_regression() -> None:
         version_b=AGENT_V2,
         test_suite=TEST_SUITE,
         n_runs=50,
-        metric="accuracy",
+        metric="tool_accuracy",
     )
     print(report)
     report.assert_stable(p_threshold=0.05, min_effect=0.2)
