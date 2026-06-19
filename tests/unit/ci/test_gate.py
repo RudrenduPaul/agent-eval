@@ -79,6 +79,20 @@ class TestAssertNoRegression:
         # With a stricter threshold, should pass
         assert_no_regression(report, p_threshold=0.01)
 
+    def test_gate_uses_own_thresholds_not_verdict(self) -> None:
+        # Report was computed with strict thresholds (p_threshold=0.01) so
+        # verdict=STABLE even though p=0.03 is significant at p=0.05.
+        # The gate must re-evaluate with its own threshold, not trust verdict.
+        report = _make_report(
+            verdict=Verdict.STABLE,
+            p_value=0.03,
+            effect_size=-0.35,
+            mean_a=0.84,
+            mean_b=0.78,
+        )
+        with pytest.raises(AssertionError, match="REGRESSED"):
+            assert_no_regression(report, p_threshold=0.05)
+
 
 class TestRegressionGate:
     def test_default_thresholds(self) -> None:

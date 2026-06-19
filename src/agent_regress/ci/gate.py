@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import warnings
 
-from agent_regress.core.report import Report, Verdict
+from agent_regress.core.report import Report
 
 _MIN_N_WARNING = 30
 
@@ -29,8 +29,10 @@ def assert_no_regression(
         )
         return
 
-    if report.verdict == Verdict.REGRESSED:
-        report.assert_stable(p_threshold=p_threshold, min_effect=min_effect)
+    # Evaluate with the gate's own thresholds, not the verdict stored in the
+    # report (which was computed with compare()'s thresholds and may differ).
+    # report.assert_stable() also guards against INSUFFICIENT_DATA (n < 10).
+    report.assert_stable(p_threshold=p_threshold, min_effect=min_effect)
 
 
 class RegressionGate:
