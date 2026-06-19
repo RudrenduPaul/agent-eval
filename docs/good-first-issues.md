@@ -191,7 +191,7 @@ The GAIA harness currently requires the path to be passed as an argument. Add su
 
 **Labels:** `good first issue`, `enhancement`
 
-`rich` is already a dependency. Add an optional progress bar to `compare()` that shows how many of the N × M runs have completed. Should be enabled by default but suppressible with `verbose=False`.
+`rich` is not currently a production dependency (it was removed as it was unused). This issue would add it as an optional dep. Add an optional progress bar to `compare()` that shows how many of the N × M runs have completed. Should be disabled by default and enabled with `verbose=True`.
 
 **Files:** `src/agent_regress/core/runner.py`, `src/agent_regress/core/compare.py`
 
