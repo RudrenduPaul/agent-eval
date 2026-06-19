@@ -24,6 +24,8 @@ def mann_whitney_u(
     scores_a: list[float],
     scores_b: list[float],
     alternative: str = "two-sided",
+    *,
+    _warn: bool = True,
 ) -> MannWhitneyResult:
     if not scores_a:
         raise ValueError("scores_a must not be empty")
@@ -39,7 +41,7 @@ def mann_whitney_u(
     n_b = len(scores_b)
     sufficient_power = n_a >= _MIN_N_RELIABLE and n_b >= _MIN_N_RELIABLE
 
-    if not sufficient_power:
+    if _warn and not sufficient_power:
         warnings.warn(
             f"n_a={n_a}, n_b={n_b}: fewer than {_MIN_N_RELIABLE} samples per group. "
             "Statistical power may be insufficient for small effects. "

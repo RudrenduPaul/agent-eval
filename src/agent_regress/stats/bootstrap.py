@@ -36,15 +36,13 @@ def bootstrap_mean_ci(
     arr_a = np.asarray(scores_a, dtype=np.float64)
     arr_b = np.asarray(scores_b, dtype=np.float64)
 
-    deltas = np.empty(n_resamples, dtype=np.float64)
-    for i in range(n_resamples):
-        sa = rng.choice(arr_a, size=len(arr_a), replace=True)
-        sb = rng.choice(arr_b, size=len(arr_b), replace=True)
-        deltas[i] = sb.mean() - sa.mean()
+    resamples_a = rng.choice(arr_a, size=(n_resamples, len(arr_a)), replace=True)
+    resamples_b = rng.choice(arr_b, size=(n_resamples, len(arr_b)), replace=True)
+    deltas = resamples_b.mean(axis=1) - resamples_a.mean(axis=1)
 
     alpha = 1.0 - confidence
-    lower = float(np.percentile(deltas, 100.0 * alpha / 2.0))
-    upper = float(np.percentile(deltas, 100.0 * (1.0 - alpha / 2.0)))
+    lower = float(np.quantile(deltas, alpha / 2.0))
+    upper = float(np.quantile(deltas, 1.0 - alpha / 2.0))
     mean_delta = float(arr_b.mean() - arr_a.mean())
 
     return BootstrapCI(
