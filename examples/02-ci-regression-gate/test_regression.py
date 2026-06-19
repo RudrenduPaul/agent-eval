@@ -24,7 +24,7 @@ def _build_agent(base_score: float, noise: float = 0.05, seed: int = 0) -> Any:
 
 
 AGENT_V1 = _build_agent(base_score=0.82, seed=0)
-AGENT_V2 = _build_agent(base_score=0.80, seed=999)
+AGENT_V2 = _build_agent(base_score=0.821, seed=999)  # d≈0.02 < min_effect=0.2
 
 TEST_SUITE = [{"query": f"task_{i}", "expected": f"answer_{i}"} for i in range(10)]
 
