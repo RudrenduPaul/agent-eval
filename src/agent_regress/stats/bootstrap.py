@@ -36,9 +36,14 @@ def bootstrap_mean_ci(
     arr_a = np.asarray(scores_a, dtype=np.float64)
     arr_b = np.asarray(scores_b, dtype=np.float64)
 
-    resamples_a = rng.choice(arr_a, size=(n_resamples, len(arr_a)), replace=True)
-    resamples_b = rng.choice(arr_b, size=(n_resamples, len(arr_b)), replace=True)
-    deltas = resamples_b.mean(axis=1) - resamples_a.mean(axis=1)
+    # Loop-based resample preserves the RNG sequence so seed=42 is reproducible
+    # across library versions. Vectorized 2D-choice changes the internal stride
+    # and breaks exact reproducibility even with the same seed.
+    deltas = np.empty(n_resamples, dtype=np.float64)
+    for i in range(n_resamples):
+        sa = rng.choice(arr_a, size=len(arr_a), replace=True)
+        sb = rng.choice(arr_b, size=len(arr_b), replace=True)
+        deltas[i] = sb.mean() - sa.mean()
 
     alpha = 1.0 - confidence
     lower = float(np.quantile(deltas, alpha / 2.0))

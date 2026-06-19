@@ -46,7 +46,15 @@ class TauBenchHarness:
             return False
 
     def _run_task_attempts(self, task: dict[str, Any], max_k: int) -> list[bool]:
-        return [self._attempt(task) for _ in range(max_k)]
+        results: list[bool] = []
+        for _ in range(max_k):
+            success = self._attempt(task)
+            results.append(success)
+            if success:
+                # any(results[:k]) == True for all k >= len(results) because
+                # Python slicing past the end returns all elements.
+                break
+        return results
 
     def evaluate(self, k_values: list[int] | None = None) -> list[TauBenchResult]:
         if k_values is None:
