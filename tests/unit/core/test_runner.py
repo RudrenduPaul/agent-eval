@@ -1,4 +1,5 @@
 """Tests for run_suite."""
+
 from __future__ import annotations
 
 import warnings
@@ -12,6 +13,7 @@ from agent_regress.core.runner import run_suite
 def _fixed_agent(score: float) -> Any:
     def _agent(test_case: dict[str, Any]) -> float:
         return score
+
     return _agent
 
 

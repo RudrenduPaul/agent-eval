@@ -1,8 +1,8 @@
 """Main compare() function: the primary public API entry point."""
+
 from __future__ import annotations
 
 import warnings
-from collections.abc import Callable
 from typing import Any
 
 import numpy as np
@@ -16,7 +16,7 @@ from agent_regress.stats.mann_whitney import mann_whitney_u
 _MIN_N_WARN = 30
 
 
-def compare(
+def compare(  # noqa: PLR0913
     version_a: AgentCallable,
     version_b: AgentCallable,
     test_suite: list[dict[str, Any]],
@@ -40,7 +40,8 @@ def compare(
     warn_msgs: list[str] = []
 
     if scorer is None and metric == "accuracy":
-        from agent_regress.core.scorer import exact_match_scorer
+        from agent_regress.core.scorer import exact_match_scorer  # noqa: PLC0415
+
         scorer = exact_match_scorer
 
     scores_a = run_suite(

@@ -1,4 +1,5 @@
 """CrewAI crew runner integration."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -6,7 +7,7 @@ from typing import Any
 
 def crewai_runner(crew: Any) -> Any:
     try:
-        import crewai  # noqa: F401  # type: ignore[import-untyped]
+        import crewai  # noqa: F401, PLC0415  # type: ignore[import-untyped]
     except ImportError as exc:
         raise ImportError(
             "CrewAI integration requires crewai. "

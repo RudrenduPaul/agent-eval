@@ -1,4 +1,5 @@
 """Tests for Report dataclass and Verdict enum."""
+
 from __future__ import annotations
 
 import pytest
@@ -80,5 +81,5 @@ class TestReport:
 
     def test_immutable(self) -> None:
         report = _make_report()
-        with pytest.raises(Exception):
+        with pytest.raises(AttributeError):
             report.verdict = Verdict.REGRESSED  # type: ignore[misc]

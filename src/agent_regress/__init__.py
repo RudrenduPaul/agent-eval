@@ -13,6 +13,7 @@ Find out if your latest agent deploy made things worse -- statistically.
     print(report)
     report.assert_stable()
 """
+
 from __future__ import annotations
 
 from agent_regress.ci.gate import RegressionGate, assert_no_regression
@@ -23,13 +24,13 @@ from agent_regress.core.scorer import exact_match_scorer, f1_scorer
 
 __version__ = "0.1.0"
 __all__ = [
-    "compare",
-    "run_suite",
+    "RegressionGate",
     "Report",
     "Verdict",
-    "RegressionGate",
+    "__version__",
     "assert_no_regression",
+    "compare",
     "exact_match_scorer",
     "f1_scorer",
-    "__version__",
+    "run_suite",
 ]

@@ -1,4 +1,5 @@
 """Built-in scorer functions for common evaluation patterns."""
+
 from __future__ import annotations
 
 from typing import Any

@@ -6,10 +6,10 @@ from agent_regress.core.runner import run_suite
 from agent_regress.core.scorer import exact_match_scorer, f1_scorer
 
 __all__ = [
-    "compare",
     "Report",
     "Verdict",
-    "run_suite",
+    "compare",
     "exact_match_scorer",
     "f1_scorer",
+    "run_suite",
 ]

@@ -5,10 +5,10 @@ from agent_regress.stats.effect_size import EffectSizeResult, compute_effect_siz
 from agent_regress.stats.mann_whitney import MannWhitneyResult, mann_whitney_u
 
 __all__ = [
-    "bootstrap_mean_ci",
     "BootstrapCI",
-    "compute_effect_sizes",
     "EffectSizeResult",
-    "mann_whitney_u",
     "MannWhitneyResult",
+    "bootstrap_mean_ci",
+    "compute_effect_sizes",
+    "mann_whitney_u",
 ]

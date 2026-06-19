@@ -1,4 +1,5 @@
 """Tests for built-in scorer functions."""
+
 from __future__ import annotations
 
 import pytest

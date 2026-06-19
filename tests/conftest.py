@@ -1,7 +1,7 @@
 """Shared pytest fixtures for agentregress tests."""
+
 from __future__ import annotations
 
-import math
 import random
 from typing import Any
 
@@ -36,18 +36,12 @@ def bad_agent() -> Any:
 
 @pytest.fixture
 def basic_test_suite() -> list[dict[str, Any]]:
-    return [
-        {"query": f"question_{i}", "expected": f"answer_{i}"}
-        for i in range(5)
-    ]
+    return [{"query": f"question_{i}", "expected": f"answer_{i}"} for i in range(5)]
 
 
 @pytest.fixture
 def large_test_suite() -> list[dict[str, Any]]:
-    return [
-        {"query": f"question_{i}", "expected": f"answer_{i}"}
-        for i in range(20)
-    ]
+    return [{"query": f"question_{i}", "expected": f"answer_{i}"} for i in range(20)]
 
 
 @pytest.fixture

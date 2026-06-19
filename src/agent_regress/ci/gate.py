@@ -3,6 +3,7 @@
 Designed for use as a pytest test step. Import and call assert_no_regression()
 or use RegressionGate.check() inside a test function.
 """
+
 from __future__ import annotations
 
 import warnings

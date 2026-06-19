@@ -1,4 +1,5 @@
 """Mann-Whitney U test with continuity correction."""
+
 from __future__ import annotations
 
 import warnings
@@ -30,7 +31,8 @@ def mann_whitney_u(
         raise ValueError("scores_b must not be empty")
     if alternative not in ("two-sided", "less", "greater"):
         raise ValueError(
-            f"alternative must be 'two-sided', 'less', or 'greater', got {alternative!r}"
+            "alternative must be 'two-sided', 'less', or 'greater', "
+            f"got {alternative!r}"
         )
 
     n_a = len(scores_a)
@@ -49,9 +51,12 @@ def mann_whitney_u(
     arr_a = np.asarray(scores_a, dtype=np.float64)
     arr_b = np.asarray(scores_b, dtype=np.float64)
     result = stats.mannwhitneyu(arr_a, arr_b, alternative=alternative, method="auto")
+    p_value = float(result.pvalue)
+    if np.isnan(p_value):
+        p_value = 1.0
     return MannWhitneyResult(
         statistic=float(result.statistic),
-        p_value=float(result.pvalue),
+        p_value=p_value,
         n_a=n_a,
         n_b=n_b,
         sufficient_power=sufficient_power,

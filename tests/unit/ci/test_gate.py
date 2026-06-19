@@ -1,8 +1,8 @@
 """Tests for the CI regression gate."""
+
 from __future__ import annotations
 
 import warnings
-from typing import Any
 
 import pytest
 

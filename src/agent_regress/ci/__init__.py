@@ -1,5 +1,5 @@
 """CI gate for blocking deploys on statistically significant regressions."""
 
-from agent_regress.ci.gate import assert_no_regression, RegressionGate
+from agent_regress.ci.gate import RegressionGate, assert_no_regression
 
-__all__ = ["assert_no_regression", "RegressionGate"]
+__all__ = ["RegressionGate", "assert_no_regression"]
