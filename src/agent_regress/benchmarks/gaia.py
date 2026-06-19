@@ -3,6 +3,7 @@
 GAIA (General AI Assistants benchmark) has three difficulty levels.
 The Level 1-3 split reveals capability boundaries that aggregate scores hide.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -37,9 +38,7 @@ class GAIAHarness:
         if not self.dataset:
             raise ValueError("dataset must not be empty")
 
-        by_level: dict[GAIALevel, list[dict[str, Any]]] = {
-            l: [] for l in GAIALevel
-        }
+        by_level: dict[GAIALevel, list[dict[str, Any]]] = {lv: [] for lv in GAIALevel}
         for task in self.dataset:
             raw_level = task.get("level", 1)
             try:

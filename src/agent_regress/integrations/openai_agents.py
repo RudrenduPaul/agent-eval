@@ -1,4 +1,5 @@
 """OpenAI Agents SDK runner integration."""
+
 from __future__ import annotations
 
 import asyncio
@@ -7,7 +8,7 @@ from typing import Any
 
 def openai_agents_runner(agent: Any) -> Any:
     try:
-        import openai  # noqa: F401  # type: ignore[import-untyped]
+        import openai  # noqa: F401, PLC0415  # type: ignore[import-untyped]
     except ImportError as exc:
         raise ImportError(
             "OpenAI Agents SDK integration requires openai-agents. "
@@ -23,7 +24,8 @@ def openai_agents_runner(agent: Any) -> Any:
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                import concurrent.futures
+                import concurrent.futures  # noqa: PLC0415
+
                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
                     future = ex.submit(asyncio.run, _run())
                     return future.result()

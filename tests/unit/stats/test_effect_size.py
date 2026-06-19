@@ -1,7 +1,6 @@
 """Tests for effect size calculations."""
-from __future__ import annotations
 
-import math
+from __future__ import annotations
 
 import pytest
 
@@ -49,6 +48,7 @@ class TestCohensD:
 
     def test_known_value(self) -> None:
         import numpy as np
+
         rng = np.random.default_rng(42)
         a = list(rng.normal(0.8, 0.1, 100))
         b = list(rng.normal(0.7, 0.1, 100))
@@ -70,6 +70,7 @@ class TestRankBiserialR:
 
     def test_range(self) -> None:
         import random
+
         rng = random.Random(42)
         a = [rng.random() for _ in range(20)]
         b = [rng.random() for _ in range(20)]

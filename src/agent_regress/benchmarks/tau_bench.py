@@ -9,6 +9,7 @@ Usage:
     harness = TauBenchHarness(agent=my_agent, dataset=load_tau_bench())
     result = harness.evaluate(k_values=[1, 4, 8])
 """
+
 from __future__ import annotations
 
 import warnings
@@ -38,8 +39,12 @@ class TauBenchHarness:
                 score = float(result) if isinstance(result, (int, float)) else 0.0
                 if score >= self.success_threshold:
                     return True
-            except Exception as exc:  # noqa: BLE001
-                warnings.warn(f"Agent raised exception on task: {exc}", UserWarning, stacklevel=3)
+            except Exception as exc:
+                warnings.warn(
+                    f"Agent raised exception on task: {exc}",
+                    UserWarning,
+                    stacklevel=3,
+                )
         return False
 
     def evaluate(self, k_values: list[int] | None = None) -> list[TauBenchResult]:

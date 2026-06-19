@@ -1,4 +1,5 @@
 """Runs an agent callable N times on a fixed test suite."""
+
 from __future__ import annotations
 
 import concurrent.futures
@@ -29,7 +30,8 @@ def run_suite(
 
     if n_runs < _MIN_STATISTICAL_N:
         warnings.warn(
-            f"n_runs={n_runs} is below the minimum for statistical validity ({_MIN_STATISTICAL_N}). "
+            f"n_runs={n_runs} is below the minimum for statistical validity "
+            f"({_MIN_STATISTICAL_N}). "
             f"Use at least {_MIN_RELIABLE_N} runs per version for reliable results.",
             UserWarning,
             stacklevel=2,
@@ -46,7 +48,8 @@ def run_suite(
             else:
                 raise TypeError(
                     f"Agent returned {type(raw).__name__!r}. "
-                    "Either return a float directly or pass scorer= to convert output to float."
+                    "Either return a float directly or pass "
+                    "scorer= to convert output to float."
                 )
             if not (0.0 <= score <= 1.0):
                 warnings.warn(

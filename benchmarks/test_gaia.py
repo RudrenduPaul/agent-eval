@@ -2,12 +2,11 @@
 
 Run: uv run pytest benchmarks/test_gaia.py -v
 """
+
 from __future__ import annotations
 
 import random
 from typing import Any
-
-import pytest
 
 from agent_regress.benchmarks.gaia import GAIAHarness, GAIALevel
 
@@ -30,9 +29,18 @@ def _mock_agent(level_accuracy: dict[int, float] | None = None) -> Any:
 
 
 MOCK_DATASET = (
-    [{"question_id": f"L1_{i}", "level": 1, "expected_answer": f"ans_{i}"} for i in range(40)]
-    + [{"question_id": f"L2_{i}", "level": 2, "expected_answer": f"ans_{i}"} for i in range(30)]
-    + [{"question_id": f"L3_{i}", "level": 3, "expected_answer": f"ans_{i}"} for i in range(30)]
+    [
+        {"question_id": f"L1_{i}", "level": 1, "expected_answer": f"ans_{i}"}
+        for i in range(40)
+    ]
+    + [
+        {"question_id": f"L2_{i}", "level": 2, "expected_answer": f"ans_{i}"}
+        for i in range(30)
+    ]
+    + [
+        {"question_id": f"L3_{i}", "level": 3, "expected_answer": f"ans_{i}"}
+        for i in range(30)
+    ]
 )
 
 

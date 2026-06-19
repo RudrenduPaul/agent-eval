@@ -2,12 +2,11 @@
 
 Run: uv run pytest benchmarks/test_tau_bench.py -v
 """
+
 from __future__ import annotations
 
 import random
 from typing import Any
-
-import pytest
 
 from agent_regress.benchmarks.tau_bench import TauBenchHarness, TauBenchResult
 

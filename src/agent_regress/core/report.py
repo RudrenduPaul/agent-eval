@@ -1,4 +1,5 @@
 """Report dataclass: p-value, effect size, CI, verdict."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -34,7 +35,10 @@ class Report:
         p_threshold: float = 0.05,
         min_effect: float = 0.2,
     ) -> None:
-        if self.verdict == Verdict.REGRESSED:
+        if self.verdict == Verdict.INSUFFICIENT_DATA:
+            return
+        is_regression = self.p_value < p_threshold and self.effect_size < -min_effect
+        if is_regression:
             pct = f"{abs(self.mean_delta) / max(self.mean_a, 1e-9):.1%}"
             raise AssertionError(
                 f"REGRESSED: {self.metric} dropped {pct} "

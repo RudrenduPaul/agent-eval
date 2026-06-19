@@ -4,6 +4,7 @@ Measures the framework contribution to SWE-bench pass rate independent
 of the underlying model. A better scaffold (test runner, output parser,
 verdict logic) can lift pass rates 5-15pp on the same model.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -45,7 +46,7 @@ class SWEBenchHarness:
                 output = self.agent(instance)
                 if self._is_resolved(output, instance):
                     resolved_ids.append(instance_id)
-            except Exception:  # noqa: BLE001
+            except Exception:  # noqa: S110
                 pass
 
         return SWEBenchResult(

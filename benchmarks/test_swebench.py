@@ -2,12 +2,11 @@
 
 Run: uv run pytest benchmarks/test_swebench.py -v
 """
+
 from __future__ import annotations
 
 import random
 from typing import Any
-
-import pytest
 
 from agent_regress.benchmarks.swebench import SWEBenchHarness
 
@@ -25,8 +24,7 @@ def _mock_agent(resolve_rate: float = 0.30) -> Any:
 
 
 MOCK_INSTANCES = [
-    {"instance_id": f"repo__issue_{i}", "repo": "mock/repo"}
-    for i in range(100)
+    {"instance_id": f"repo__issue_{i}", "repo": "mock/repo"} for i in range(100)
 ]
 
 

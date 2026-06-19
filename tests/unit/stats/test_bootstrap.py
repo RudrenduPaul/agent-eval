@@ -1,9 +1,10 @@
 """Tests for bootstrap confidence interval implementation."""
+
 from __future__ import annotations
 
 import pytest
 
-from agent_regress.stats.bootstrap import bootstrap_mean_ci, BootstrapCI
+from agent_regress.stats.bootstrap import BootstrapCI, bootstrap_mean_ci
 
 
 class TestBootstrapMeanCI:
@@ -23,9 +24,12 @@ class TestBootstrapMeanCI:
         assert ci.mean_delta < 0.0
 
     def test_ci_contains_zero_for_similar(self) -> None:
-        a = [0.75] * 50
-        b = [0.76] * 50
-        ci = bootstrap_mean_ci(a, b, n_resamples=200)
+        import random
+
+        rng = random.Random(42)
+        a = [rng.gauss(0.75, 0.1) for _ in range(50)]
+        b = [rng.gauss(0.76, 0.1) for _ in range(50)]
+        ci = bootstrap_mean_ci(a, b, n_resamples=1000, seed=42)
         assert ci.lower <= 0.0 <= ci.upper
 
     def test_empty_a_raises(self) -> None:

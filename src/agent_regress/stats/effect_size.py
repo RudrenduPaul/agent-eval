@@ -1,4 +1,5 @@
 """Effect size calculations: Cohen's d and rank-biserial r."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -30,7 +31,10 @@ def cohens_d(scores_a: list[float], scores_b: list[float]) -> float:
     pooled_std = float(np.sqrt(pooled_var))
 
     if pooled_std == 0.0:
-        return 0.0
+        delta = float(arr_b.mean() - arr_a.mean())
+        if delta == 0.0 or n_a <= 1 or n_b <= 1:
+            return 0.0
+        return float(np.copysign(np.inf, delta))
     return float((arr_b.mean() - arr_a.mean()) / pooled_std)
 
 
@@ -41,15 +45,14 @@ def rank_biserial_r(scores_a: list[float], scores_b: list[float]) -> float:
         raise ValueError("scores_b must not be empty")
 
     n_a, n_b = len(scores_a), len(scores_b)
-    concordant = sum(
-        1.0 if b > a else 0.5 if b == a else 0.0
-        for a in scores_a
-        for b in scores_b
-    )
+    arr_a = np.asarray(scores_a, dtype=np.float64)
+    arr_b = np.asarray(scores_b, dtype=np.float64)
+    diff = arr_b[np.newaxis, :] - arr_a[:, np.newaxis]
+    concordant = float(np.sum(diff > 0) + 0.5 * np.sum(diff == 0))
     return 2.0 * concordant / (n_a * n_b) - 1.0
 
 
-def _interpret(d: float) -> str:
+def interpret_cohens_d(d: float) -> str:
     abs_d = abs(d)
     if abs_d < 0.2:
         return "negligible"
@@ -66,5 +69,5 @@ def compute_effect_sizes(
     d = cohens_d(scores_a, scores_b)
     r = rank_biserial_r(scores_a, scores_b)
     return EffectSizeResult(
-        cohens_d=d, rank_biserial_r=r, interpretation=_interpret(d)
+        cohens_d=d, rank_biserial_r=r, interpretation=interpret_cohens_d(d)
     )

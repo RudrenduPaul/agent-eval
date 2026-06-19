@@ -1,4 +1,5 @@
 """Bootstrap confidence intervals on score distribution deltas."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

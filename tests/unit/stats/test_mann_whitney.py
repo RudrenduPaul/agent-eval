@@ -1,11 +1,12 @@
 """Tests for Mann-Whitney U test implementation."""
+
 from __future__ import annotations
 
 import warnings
 
 import pytest
 
-from agent_regress.stats.mann_whitney import mann_whitney_u, MannWhitneyResult
+from agent_regress.stats.mann_whitney import MannWhitneyResult, mann_whitney_u
 
 
 class TestMannWhitneyU:
@@ -26,6 +27,7 @@ class TestMannWhitneyU:
 
     def test_identical_distributions_not_significant(self) -> None:
         import random
+
         rng = random.Random(42)
         scores = [rng.gauss(0.7, 0.05) for _ in range(50)]
         a = scores[:25]
