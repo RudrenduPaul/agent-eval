@@ -42,6 +42,7 @@ report = compare(
     version_b=agent_v2,
     test_suite=test_suite,
     n_runs=50,
+    metric="tool_accuracy",  # use any non-"accuracy" name when agents return floats
 )
 
 print(report)
@@ -51,16 +52,16 @@ Output:
 
 ```
 ============================================================
-agentregress Report -- accuracy
+agentregress Report -- tool_accuracy
 ============================================================
 Verdict:    REGRESSED
 p-value:    0.0000
-Cohen's d:  -2.746
-95% CI:     [-0.162, -0.148]
+Cohen's d:  -3.709
+95% CI:     [-0.126, -0.112]
 
-Version A:  0.8271 +/- 0.0443  (n=150)
-Version B:  0.6723 +/- 0.0663  (n=150)
-Delta:      -0.1548
+Version A:  0.7918 +/- 0.0264  (n=150)
+Version B:  0.6728 +/- 0.0370  (n=150)
+Delta:      -0.1191
 ============================================================
 ```
 
