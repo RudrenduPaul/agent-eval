@@ -10,7 +10,8 @@
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Email: security@agentregress.dev
+Report privately via GitHub Security Advisories:
+**https://github.com/RudrenduPaul/agentregress/security/advisories/new**
 
 We will acknowledge your report within **48 hours** and provide a remediation
 timeline within 7 days.
@@ -21,7 +22,8 @@ whichever comes first.
 ## Scope
 
 This policy covers the core library (`src/agent_regress/`). Third-party
-integrations are covered on a best-effort basis.
+integrations are covered on a best-effort basis -- identify the specific
+integration package in your report.
 
 ## What We Consider a Vulnerability
 
