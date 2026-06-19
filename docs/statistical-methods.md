@@ -43,7 +43,7 @@ from scipy import stats
 result = stats.mannwhitneyu(arr_a, arr_b, alternative="two-sided", method="auto")
 ```
 
-`method="auto"` selects exact computation for small n (< 25 per group) and asymptotic (normal approximation with tie correction) for larger n.
+`method="auto"` selects the exact permutation method when the sample sizes are small enough for the computation to be feasible without numerical overflow, and falls back to the asymptotic normal approximation (with tie correction) for very large n. In practice (scipy ≥ 1.13), exact is used for n ≤ ~500 per group; asymptotic kicks in for n ≥ 1000. Both methods are valid; the exact method is slightly more accurate for small samples with ties.
 
 When all observations are identical across both groups, the test is degenerate and scipy returns NaN. agentregress handles this by returning p=1.0 (no significant difference detected, which is correct).
 
