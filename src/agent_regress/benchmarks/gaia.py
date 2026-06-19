@@ -6,6 +6,7 @@ The Level 1-3 split reveals capability boundaries that aggregate scores hide.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from enum import IntEnum
 from typing import Any
@@ -69,5 +70,11 @@ class GAIAHarness:
     def _safe_run(self, task: dict[str, Any]) -> Any:
         try:
             return self.agent(task)
-        except Exception:
+        except Exception as exc:
+            task_id = task.get("task_id", task.get("question_id", "unknown"))
+            warnings.warn(
+                f"Agent raised exception on task {task_id}: {exc}",
+                UserWarning,
+                stacklevel=2,
+            )
             return None

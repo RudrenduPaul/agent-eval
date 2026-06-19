@@ -57,7 +57,7 @@ def run_suite(
                     f"Score {score:.4f} outside [0.0, 1.0]. Clamping. "
                     "Ensure your scorer returns values in [0.0, 1.0].",
                     UserWarning,
-                    stacklevel=2,
+                    stacklevel=1,
                 )
                 score = max(0.0, min(1.0, score))
             case_scores.append(score)
