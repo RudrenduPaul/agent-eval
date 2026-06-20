@@ -8,7 +8,7 @@ from agent_regress.core.runner import AgentCallable
 
 
 def langgraph_runner(graph: Any, input_key: str = "messages") -> AgentCallable:
-    """Wrap a LangGraph graph as an agentregress AgentCallable.
+    """Wrap a LangGraph graph as an agent-regress AgentCallable.
 
     Args:
         graph: A compiled LangGraph graph with an .invoke() method.

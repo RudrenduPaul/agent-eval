@@ -1,4 +1,4 @@
-"""Shared pytest fixtures for agentregress tests."""
+"""Shared pytest fixtures for agent-eval tests."""
 
 from __future__ import annotations
 
