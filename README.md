@@ -10,9 +10,9 @@
 
 [![PyPI](https://img.shields.io/pypi/v/agent-regress)](https://pypi.org/project/agent-regress/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://github.com/RudrenduPaul/agentregress/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agentregress/actions/workflows/ci.yml)
-[![Coverage: 99%](https://img.shields.io/badge/coverage-99%25-brightgreen)](https://github.com/RudrenduPaul/agentregress/actions)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agentregress/badge)](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agentregress)
+[![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
+[![Coverage: 99%](https://img.shields.io/badge/coverage-99%25-brightgreen)](https://github.com/RudrenduPaul/agent-eval/actions)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval/badge)](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval)
 
 ---
 
@@ -140,7 +140,7 @@ uv run pytest test_regression.py
 Add the stability badge to your agent repo:
 
 ```markdown
-[![agentregress](https://img.shields.io/badge/agentregress-stable-brightgreen)](https://github.com/RudrenduPaul/agentregress)
+[![agentregress](https://img.shields.io/badge/agentregress-stable-brightgreen)](https://github.com/RudrenduPaul/agent-eval)
 ```
 
 ---
@@ -201,7 +201,7 @@ Measured on Apple M3 Pro, Python 3.14, scipy 1.15, numpy 2.2:
 Reproduce:
 
 ```bash
-git clone https://github.com/RudrenduPaul/agentregress
+git clone https://github.com/RudrenduPaul/agent-eval
 cd agentregress
 uv sync --extra dev
 uv run pytest benchmarks/test_stat_overhead.py --benchmark-only -v
@@ -246,7 +246,7 @@ See [leaderboard/README.md](leaderboard/README.md) to submit results.
 ## Try it in Docker
 
 ```bash
-git clone https://github.com/RudrenduPaul/agentregress
+git clone https://github.com/RudrenduPaul/agent-eval
 cd agentregress
 docker compose up
 ```
@@ -294,7 +294,7 @@ If you use agentregress in research, please cite:
   author = {Paul, Rudrendu and Nandy, Sourav},
   title = {agentregress: Statistical Regression Testing for LLM Agents},
   year = {2026},
-  url = {https://github.com/RudrenduPaul/agentregress},
+  url = {https://github.com/RudrenduPaul/agent-eval},
   license = {Apache-2.0}
 }
 ```
