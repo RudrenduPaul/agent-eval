@@ -10,8 +10,11 @@
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Report privately via GitHub Security Advisories:
-**https://github.com/RudrenduPaul/agentregress/security/advisories/new**
+Report privately via one of these channels:
+
+- **GitHub Security Advisories (preferred):**
+  **https://github.com/RudrenduPaul/agent-eval/security/advisories/new**
+- **Email:** agent.eval.oss.security@gmail.com
 
 We will acknowledge your report within **48 hours** and provide a remediation
 timeline within 7 days.
