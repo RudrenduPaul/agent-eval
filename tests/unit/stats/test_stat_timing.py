@@ -14,7 +14,9 @@ from agent_regress.stats.effect_size import compute_effect_sizes
 from agent_regress.stats.mann_whitney import mann_whitney_u
 
 
-def _make_scores(n: int, mean: float = 0.75, std: float = 0.08, seed: int = 42) -> list[float]:
+def _make_scores(
+    n: int, mean: float = 0.75, std: float = 0.08, seed: int = 42
+) -> list[float]:
     rng = random.Random(seed)
     return [max(0.0, min(1.0, rng.gauss(mean, std))) for _ in range(n)]
 
