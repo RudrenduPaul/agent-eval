@@ -1,4 +1,4 @@
-# CLAUDE.md -- agentregress
+# CLAUDE.md -- agent-eval
 
 ## Git Workflow
 
@@ -16,7 +16,7 @@ Never use Co-Authored-By: lines.
 
 ## Project Overview
 
-agentregress: Python statistical regression testing framework for LLM agents.
+agent-eval: Python statistical regression testing framework for LLM agents.
 
 Core angle: run agent N times at version A, N times at version B, apply
 Mann-Whitney U + bootstrap CI, report p-value and Cohen's d.

@@ -9,7 +9,7 @@ services:
     ports:
       - "8080:8080"
 
-  # Basic comparison example — shows agentregress output on first run
+  # Basic comparison example — shows agent-regress output on first run
   example:
     image: python:3.12-slim
     working_dir: /app

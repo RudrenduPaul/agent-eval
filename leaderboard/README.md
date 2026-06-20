@@ -1,4 +1,4 @@
-# agentregress Leaderboard
+# agent-eval Leaderboard
 
 This directory tracks Tau-bench pass^k, GAIA, and SWE-bench results across
 models and frameworks.
@@ -27,5 +27,5 @@ succeeded at least once. We report k=1, k=4, k=8.
 
 **GAIA:** Run on GAIA validation set. Report accuracy by difficulty level (1, 2, 3).
 
-**SWE-bench:** Report resolved rate on SWE-bench Verified using the agentregress
+**SWE-bench:** Report resolved rate on SWE-bench Verified using the agent-eval
 scaffold harness.

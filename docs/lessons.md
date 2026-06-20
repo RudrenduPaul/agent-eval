@@ -1,4 +1,4 @@
-# agentregress -- Lessons Log
+# agent-eval -- Lessons Log
 
 Read this file at the start of every session before writing code.
 

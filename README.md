@@ -198,7 +198,7 @@ Reproduce:
 
 ```bash
 git clone https://github.com/RudrenduPaul/agent-eval
-cd agentregress
+cd agent-eval
 uv sync --extra dev
 uv run pytest benchmarks/test_stat_overhead.py --benchmark-only -v
 ```
@@ -243,7 +243,7 @@ See [leaderboard/README.md](leaderboard/README.md) to submit results.
 
 ```bash
 git clone https://github.com/RudrenduPaul/agent-eval
-cd agentregress
+cd agent-eval
 docker compose up
 ```
 
@@ -275,7 +275,7 @@ See [leaderboard/README.md](leaderboard/README.md).
 - Stats module (`src/agent_regress/stats/`) must stay pure Python + scipy — no LLM calls, ever
 - All PRs require 95% coverage on `stats/`, 90% on `core/` and `ci/`
 
-GitHub Discussions for design questions. Discord for community: discord.gg/agentregress
+GitHub Discussions for design questions. Discord for community: discord.gg/agent-eval
 
 Apache 2.0. Contributions welcome.
 

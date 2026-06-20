@@ -58,7 +58,7 @@ class Report:
         lines = [
             "",
             _SEPARATOR,
-            f"agentregress Report -- {self.metric}",
+            f"agent-regress Report -- {self.metric}",
             _SEPARATOR,
             f"Verdict:    {self.verdict.value}",
             f"p-value:    {self.p_value:.4f}",
