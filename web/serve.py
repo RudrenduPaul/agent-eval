@@ -29,7 +29,7 @@ def _load_results() -> list[dict]:
 def _render_row(r: dict) -> str:
     tau = r.get("tau_bench", {})
     gaia = r.get("gaia", {})
-    swe = r.get("swe_bench", {})
+    swe = r.get("swebench", {})
 
     tau_k1 = f"{tau.get('pass_at_1', '—'):.3f}" if isinstance(tau.get("pass_at_1"), float) else "—"
     tau_k4 = f"{tau.get('pass_at_4', '—'):.3f}" if isinstance(tau.get("pass_at_4"), float) else "—"
@@ -37,7 +37,7 @@ def _render_row(r: dict) -> str:
     gaia_l1 = f"{gaia.get('level_1_accuracy', '—'):.3f}" if isinstance(gaia.get("level_1_accuracy"), float) else "—"
     gaia_l2 = f"{gaia.get('level_2_accuracy', '—'):.3f}" if isinstance(gaia.get("level_2_accuracy"), float) else "—"
     gaia_l3 = f"{gaia.get('level_3_accuracy', '—'):.3f}" if isinstance(gaia.get("level_3_accuracy"), float) else "—"
-    swe_rate = f"{swe.get('resolved_rate', '—'):.3f}" if isinstance(swe.get("resolved_rate"), float) else "—"
+    swe_rate = f"{swe.get('scaffold_pass_rate', '—'):.3f}" if isinstance(swe.get("scaffold_pass_rate"), float) else "—"
 
     return f"""
         <tr>

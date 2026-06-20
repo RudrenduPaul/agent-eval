@@ -1,4 +1,4 @@
-"""agentregress: statistical regression testing for LLM agents.
+"""agent-regress: statistical regression testing for LLM agents.
 
 Find out if your latest agent deploy made things worse -- statistically.
 

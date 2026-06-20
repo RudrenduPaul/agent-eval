@@ -52,7 +52,7 @@ Output:
 
 ```
 ============================================================
-agentregress Report -- tool_accuracy
+agent-regress Report -- tool_accuracy
 ============================================================
 Verdict:    REGRESSED
 p-value:    0.0000
@@ -172,7 +172,7 @@ Default: p < 0.05 and Cohen's d ≥ 0.2.
 
 **"n_runs too small" warning** — Use n_runs ≥ 30 per version for reliable results. Use n_runs ≥ 50 for production CI gates.
 
-**Scores outside [0.0, 1.0]** — agentregress clamps and warns. Ensure your scorer returns values in [0.0, 1.0].
+**Scores outside [0.0, 1.0]** — agent-eval clamps and warns. Ensure your scorer returns values in [0.0, 1.0].
 
 **INSUFFICIENT_DATA** — Fewer than 10 scores per group. Increase n_runs or add test cases.
 

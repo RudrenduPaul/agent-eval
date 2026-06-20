@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "agentregress Leaderboard Submission",
+  "title": "agent-eval Leaderboard Submission",
   "type": "object",
   "required": ["model_name", "framework", "submitted_by", "submitted_date", "reproduction_command"],
   "properties": {
