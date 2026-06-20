@@ -53,9 +53,7 @@ class GAIAHarness:
             if not tasks:
                 continue
             correct = sum(
-                1
-                for task in tasks
-                if self._is_correct(self._safe_run(task), task)
+                1 for task in tasks if self._is_correct(self._safe_run(task), task)
             )
             results.append(
                 GAIALevelResult(
