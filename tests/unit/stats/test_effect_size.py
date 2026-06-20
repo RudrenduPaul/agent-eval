@@ -46,6 +46,14 @@ class TestCohensD:
         d = cohens_d([0.8], [0.6])
         assert d == 0.0
 
+    def test_inf_for_constant_arrays_with_different_means(self) -> None:
+        # Both arrays constant but different — pooled std is 0, delta != 0.
+        # Must return ±inf, not a huge spurious finite number from FP rounding
+        # of near-zero variance on non-exactly-representable floats (0.8, 0.3…).
+        assert cohens_d([0.8] * 50, [0.6] * 50) == float("-inf")
+        assert cohens_d([0.3] * 50, [0.7] * 50) == float("inf")
+        assert cohens_d([0.9] * 50, [0.1] * 50) == float("-inf")
+
     def test_known_value(self) -> None:
         import numpy as np
 
