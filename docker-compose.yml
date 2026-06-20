@@ -1,5 +1,16 @@
 services:
-  agentregress:
+  # Leaderboard UI at http://localhost:8080
+  web:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: python web/serve.py
+    ports:
+      - "8080:8080"
+
+  # Basic comparison example — shows agentregress output on first run
+  example:
     image: python:3.12-slim
     working_dir: /app
     volumes:
