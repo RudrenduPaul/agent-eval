@@ -10,7 +10,7 @@ from agent_regress.core.runner import AgentCallable
 
 
 def openai_agents_runner(agent: Any) -> AgentCallable:
-    """Wrap an OpenAI Agents SDK agent as an agentregress AgentCallable.
+    """Wrap an OpenAI Agents SDK agent as an agent-regress AgentCallable.
 
     Handles both synchronous and async (Jupyter / already-running-loop) contexts
     by spawning a background thread when a running event loop is detected.

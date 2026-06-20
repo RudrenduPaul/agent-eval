@@ -3,10 +3,10 @@
 **Statistical regression testing for LLM agents.** Run your agent 50 times on a fixed test suite at version A, 50 times at version B, and get a p-value on whether behavior actually changed, not just whether the score looks different.
 
 <!-- DEMO GIF: terminal showing two agent runs across 50 test cases. Version A baseline runs.
-     Version B runs. agentregress compare prints the structured output: metric name, p-value,
+     Version B runs. agent-eval compare prints the structured output: metric name, p-value,
      Cohen's d, CI, verdict REGRESSED. 8-10 seconds. No logo, no music, just the terminal.
      Record with: uv run python examples/01-basic-comparison/example.py and capture via asciinema.
-     Replace this comment with: ![agentregress demo](docs/demo.gif) when ready. -->
+     Replace this comment with: ![agent-eval demo](docs/demo.gif) when ready. -->
 
 [![PyPI](https://img.shields.io/pypi/v/agent-regress)](https://pypi.org/project/agent-regress/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -34,7 +34,7 @@ Agent Evaluation answers the distributional question with a p-value and effect s
 
 ```
 ============================================================
-agentregress Report -- tool_accuracy
+agent-regress Report -- tool_accuracy
 ============================================================
 Verdict:    REGRESSED
 p-value:    0.0031
@@ -140,7 +140,7 @@ uv run pytest test_regression.py
 Add the stability badge to your agent repo:
 
 ```markdown
-[![Agent Evaluation](https://img.shields.io/badge/agentregress-stable-brightgreen)](https://github.com/RudrenduPaul/agent-eval)
+[![Agent Evaluation](https://img.shields.io/badge/agent--eval-stable-brightgreen)](https://github.com/RudrenduPaul/agent-eval)
 ```
 
 ---
