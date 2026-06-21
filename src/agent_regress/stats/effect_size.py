@@ -62,6 +62,8 @@ def rank_biserial_r(scores_a: list[float], scores_b: list[float]) -> float:
     n_a, n_b = len(scores_a), len(scores_b)
     arr_a = np.asarray(scores_a, dtype=np.float64)
     arr_b = np.asarray(scores_b, dtype=np.float64)
+    if np.any(np.isnan(arr_a)) or np.any(np.isnan(arr_b)):
+        return float("nan")
     diff = arr_b[np.newaxis, :] - arr_a[:, np.newaxis]
     concordant = float(np.sum(diff > 0) + 0.5 * np.sum(diff == 0))
     return 2.0 * concordant / (n_a * n_b) - 1.0

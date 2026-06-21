@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from typing import Any
 
 
 def _get_expected(test_case: dict[str, Any]) -> Any:
-    expected = test_case.get("expected")
-    if expected is None:
+    if "expected" not in test_case:
         raise KeyError(
             "test_case missing 'expected' key. "
             "Add expected values or pass a custom scorer= function."
         )
-    return expected
+    return test_case["expected"]
 
 
 def exact_match_scorer(output: Any, test_case: dict[str, Any]) -> float:
@@ -23,16 +23,18 @@ def exact_match_scorer(output: Any, test_case: dict[str, Any]) -> float:
 def f1_scorer(output: Any, test_case: dict[str, Any]) -> float:
     expected = _get_expected(test_case)
 
-    pred_tokens = set(str(output).lower().split())
-    gold_tokens = set(str(expected).lower().split())
+    pred_tokens = str(output).lower().split()
+    gold_tokens = str(expected).lower().split()
 
     if not pred_tokens and not gold_tokens:
         return 1.0
     if not pred_tokens or not gold_tokens:
         return 0.0
 
-    tp = len(pred_tokens & gold_tokens)
-    precision = tp / len(pred_tokens)
-    recall = tp / len(gold_tokens)
+    pred_counter = Counter(pred_tokens)
+    gold_counter = Counter(gold_tokens)
+    tp = sum((pred_counter & gold_counter).values())
+    precision = tp / sum(pred_counter.values())
+    recall = tp / sum(gold_counter.values())
     denom = precision + recall
     return 0.0 if denom == 0.0 else 2.0 * precision * recall / denom

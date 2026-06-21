@@ -59,6 +59,8 @@ class TauBenchHarness:
     def evaluate(self, k_values: list[int] | None = None) -> list[TauBenchResult]:
         if k_values is None:
             k_values = [1, 4, 8]
+        if not k_values:
+            raise ValueError("k_values must not be empty")
         if not self.dataset:
             raise ValueError("dataset must not be empty")
 
