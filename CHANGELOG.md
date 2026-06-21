@@ -7,6 +7,22 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- `mann_whitney_u`: raise `ValueError` on NaN input instead of silently returning `p=1.0`
+- `rank_biserial_r`: propagate `nan` instead of silently returning `-1.0` on NaN input
+- `run_suite`: warn threshold raised from n<10 to n<30 to match recommendation message
+- `_get_expected`: fix `KeyError` when `expected` key is present but set to `None`
+- `f1_scorer`: use `Counter` multiset intersection instead of set intersection — fixes wrong F1 when tokens repeat
+- `compare`: align `_MIN_N_WARN` threshold (was 30, now 50) with warning message and `n_runs` default
+- `compare` / `Report`: store `p_threshold` and `min_effect` on `Report` so `assert_stable()` uses the right defaults
+- `gaia.py`: fix false-positive accuracy when agent raises and `expected_answer` is `'none'`
+- `tau_bench.py`: raise clear `ValueError` on empty `k_values` instead of opaque `max()` error
+- `langchain` / `langgraph` integrations: fix fallback adapters that were wrapping `test_case` in a nested dict
+- `openai_agents_runner`: narrow `RuntimeError` catch to avoid masking real errors and double-invoking the agent
+- `benchmarks/__init__`: export `GAIALevelResult`, `SWEBenchResult`, `TauBenchResult`
+- `core/__init__` / top-level `__init__`: export `AgentCallable` and `ScorerCallable` type aliases
+
 ## [0.1.0] - 2026-06-19
 
 ### Added

@@ -2,11 +2,22 @@
 
 **Statistical regression testing for LLM agents.** Run your agent 50 times on a fixed test suite at version A, 50 times at version B, and get a p-value on whether behavior actually changed, not just whether the score looks different.
 
-<!-- DEMO GIF: terminal showing two agent runs across 50 test cases. Version A baseline runs.
-     Version B runs. agent-eval compare prints the structured output: metric name, p-value,
-     Cohen's d, CI, verdict REGRESSED. 8-10 seconds. No logo, no music, just the terminal.
-     Record with: uv run python examples/01-basic-comparison/example.py and capture via asciinema.
-     Replace this comment with: ![agent-eval demo](docs/demo.gif) when ready. -->
+```
+$ uv run python examples/01-basic-comparison/example.py
+
+============================================================
+agent-regress Report -- tool_accuracy
+============================================================
+Verdict:    REGRESSED
+p-value:    0.0031
+Cohen's d:  -0.610
+95% CI:     [-0.221, -0.067]
+
+Version A:  0.8400 +/- 0.0601  (n=50)
+Version B:  0.7000 +/- 0.0903  (n=50)
+Delta:      -0.1400
+============================================================
+```
 
 [![PyPI](https://img.shields.io/pypi/v/agent-regress)](https://pypi.org/project/agent-regress/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -103,7 +114,7 @@ Agent returns text? Pass a scorer or use the built-ins:
 from agent_regress import compare, exact_match_scorer, f1_scorer
 
 # exact_match_scorer: 1.0 if str(output).strip() == str(expected).strip()
-# f1_scorer: token-level F1 (set-based)
+# f1_scorer: token-level F1 (multiset — handles repeated tokens correctly)
 report = compare(
     version_a=agent_v1,
     version_b=agent_v2,
