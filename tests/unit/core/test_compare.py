@@ -151,7 +151,7 @@ class TestCompare:
                 metric="performance",
             )
         msgs = " ".join(str(warning.message) for warning in w)
-        assert "insufficient" in msgs.lower() or "30" in msgs
+        assert "insufficient" in msgs.lower() or "50" in msgs
 
     def test_default_exact_match_scorer_used(self) -> None:
         def perfect_agent(tc: dict[str, Any]) -> str:

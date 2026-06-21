@@ -13,7 +13,7 @@ from agent_regress.stats.bootstrap import bootstrap_mean_ci
 from agent_regress.stats.effect_size import cohens_d
 from agent_regress.stats.mann_whitney import mann_whitney_u
 
-_MIN_N_WARN = 30
+_MIN_N_WARN = 50
 
 
 def compare(  # noqa: PLR0913
@@ -63,7 +63,7 @@ def compare(  # noqa: PLR0913
     if n_a < _MIN_N_WARN or n_b < _MIN_N_WARN:
         msg = (
             f"n_a={n_a}, n_b={n_b}: insufficient for 80% power at small effect "
-            f"(d=0.2). Run at least 50 per version for reliable results."
+            f"(d=0.2). Run at least {_MIN_N_WARN} per version for reliable results."
         )
         warn_msgs.append(msg)
         warnings.warn(msg, UserWarning, stacklevel=2)
@@ -98,5 +98,7 @@ def compare(  # noqa: PLR0913
         std_a=std_a,
         std_b=std_b,
         mean_delta=ci.mean_delta,
+        p_threshold=p_threshold,
+        min_effect=min_effect,
         warnings=warn_msgs,
     )

@@ -32,6 +32,8 @@ def langchain_runner(chain: Any, input_key: str = "input") -> AgentCallable:
         )
 
     def _agent(test_case: dict[str, Any]) -> Any:
-        return chain.invoke({input_key: test_case.get(input_key, test_case)})
+        if input_key in test_case:
+            return chain.invoke({input_key: test_case[input_key]})
+        return chain.invoke(test_case)
 
     return _agent

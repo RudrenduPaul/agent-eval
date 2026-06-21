@@ -19,13 +19,15 @@ from __future__ import annotations
 from agent_regress.ci.gate import RegressionGate, assert_no_regression
 from agent_regress.core.compare import compare
 from agent_regress.core.report import Report, Verdict
-from agent_regress.core.runner import run_suite
+from agent_regress.core.runner import AgentCallable, ScorerCallable, run_suite
 from agent_regress.core.scorer import exact_match_scorer, f1_scorer
 
 __version__ = "0.1.0"
 __all__ = [
+    "AgentCallable",
     "RegressionGate",
     "Report",
+    "ScorerCallable",
     "Verdict",
     "__version__",
     "assert_no_regression",
