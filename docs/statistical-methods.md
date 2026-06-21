@@ -45,7 +45,7 @@ result = stats.mannwhitneyu(arr_a, arr_b, alternative="two-sided", method="auto"
 
 `method="auto"` selects the exact permutation method when the sample sizes are small enough for the computation to be feasible without numerical overflow, and falls back to the asymptotic normal approximation (with tie correction) for very large n. In practice (scipy ≥ 1.13), exact is used for n ≤ ~500 per group; asymptotic kicks in for n ≥ 1000. Both methods are valid; the exact method is slightly more accurate for small samples with ties.
 
-When all observations are identical across both groups, the test is degenerate and scipy returns NaN. agent-eval handles this by returning p=1.0 (no significant difference detected, which is correct).
+When all observations are identical across both groups (all-tied case), scipy returns a valid U statistic but a NaN p-value. agent-eval handles this by substituting p=1.0, which is correct: no significant difference is detectable. If the U statistic itself is NaN (caused by NaN values in the input data), agent-eval raises a `ValueError` — NaN scores indicate a data pipeline problem that should be fixed before running a comparison.
 
 **Warning threshold:** n < 30 per group. At n=30, Mann-Whitney has approximately 80% power to detect a medium effect (Cohen's d = 0.5) at α=0.05. Below n=30, you may miss real regressions. agent-eval warns but does not fail the gate on insufficient data.
 
