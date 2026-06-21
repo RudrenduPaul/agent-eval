@@ -97,24 +97,38 @@ print(report)           # structured output with p-value, CI, effect size
 report.assert_stable()  # raises AssertionError if behavior regressed
 ```
 
-Agent returns text? Pass a scorer:
+Agent returns text? Pass a scorer or use the built-ins:
 
 ```python
-def my_scorer(output: str, test_case: dict) -> float:
-    return 1.0 if output.strip() == test_case["expected"] else 0.0
+from agent_regress import compare, exact_match_scorer, f1_scorer
 
+# exact_match_scorer: 1.0 if str(output).strip() == str(expected).strip()
+# f1_scorer: token-level F1 (set-based)
 report = compare(
     version_a=agent_v1,
     version_b=agent_v2,
     test_suite=test_suite,
     n_runs=50,
-    scorer=my_scorer,
+    scorer=exact_match_scorer,  # test_case must have an "expected" key
 )
+```
+
+Or write your own:
+
+```python
+def my_scorer(output: str, test_case: dict) -> float:
+    return 1.0 if output.strip() == test_case["expected"] else 0.0
+
+report = compare(..., scorer=my_scorer)
 ```
 
 ---
 
 ## Add to CI: fail the build on regression
+
+Two patterns. Pick one.
+
+**`report.assert_stable()`** — inline, after you've already called `compare()`:
 
 ```python
 # test_regression.py -- add to your existing test suite
@@ -132,6 +146,24 @@ def test_no_regression():
         min_effect=0.2,    # Cohen's d threshold -- ignore noise below 0.2
     )
 ```
+
+**`RegressionGate`** — reusable gate object, useful when you run multiple comparisons with the same thresholds:
+
+```python
+from agent_regress import compare, RegressionGate
+
+gate = RegressionGate(p_threshold=0.05, min_effect=0.2)
+
+def test_tool_accuracy():
+    report = compare(version_a=prod, version_b=staging, test_suite=suite, n_runs=50)
+    gate.check(report)  # raises AssertionError on regression; warns if n < 30
+
+def test_routing_accuracy():
+    report = compare(version_a=prod, version_b=staging, test_suite=routing_suite, n_runs=50)
+    gate.check(report)
+```
+
+Both patterns: warn (not fail) when `n < 30` per version; treat `n < 10` as insufficient data and skip the gate.
 
 ```bash
 uv run pytest test_regression.py
@@ -233,7 +265,24 @@ results = harness.evaluate(k_values=[1, 4, 8])
 
 **GAIA Level 1-3 split** stratifies by task difficulty. Overall accuracy hides per-difficulty regressions: a prompt change that helps Level 1 often hurts Level 3.
 
+```python
+from agent_regress.benchmarks.gaia import GAIAHarness
+
+harness = GAIAHarness(agent=my_agent, dataset=gaia_dataset)
+results = harness.evaluate()  # returns list[GAIALevelResult], one per level
+for r in results:
+    print(f"Level {r.level}: {r.accuracy:.3f}  ({r.n_correct}/{r.n_questions})")
+```
+
 **SWE-bench scaffold score** isolates framework contribution from model contribution.
+
+```python
+from agent_regress.benchmarks.swebench import SWEBenchHarness
+
+harness = SWEBenchHarness(agent=my_agent, dataset=swe_dataset)
+result = harness.evaluate()
+print(f"scaffold pass rate: {result.scaffold_pass_rate:.3f}  ({result.n_resolved}/{result.n_instances})")
+```
 
 See [leaderboard/README.md](leaderboard/README.md) to submit results.
 
@@ -247,7 +296,12 @@ cd agent-eval
 docker compose up
 ```
 
-Runs the basic comparison example inside a container, no local Python setup needed. Good for verifying the install works before wiring it into your own agent.
+Starts two services:
+
+- **web** (`http://localhost:8080`) — leaderboard UI served by `web/serve.py`, reading `leaderboard/results/*.json`
+- **example** — runs `examples/01-basic-comparison/example.py` and prints the comparison report to stdout
+
+Good for verifying the install works and seeing the leaderboard UI before wiring agent-regress into your own agent.
 
 ---
 
