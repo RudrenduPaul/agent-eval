@@ -2,16 +2,9 @@
 
 **Statistical regression testing for LLM agents.** Run your agent 50 times on a fixed test suite at version A, 50 times at version B, and get a p-value on whether behavior actually changed -- not just whether the score looks different.
 
-<!-- DEMO GIF: terminal showing two agent runs across 50 test cases. Version A baseline runs.
-     Version B runs. agentregress compare prints the structured output: metric name, p-value,
-     Cohen's d, CI, verdict REGRESSED. 8-10 seconds. No logo, no music, just the terminal.
-     Record with: uv run python examples/01-basic-comparison/example.py and capture via asciinema.
-     Replace this comment with: ![agentregress demo](docs/demo.gif) when ready. -->
-
 [![PyPI](https://img.shields.io/pypi/v/agent-regress)](https://pypi.org/project/agent-regress/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
-[![Coverage: 99%](https://img.shields.io/badge/coverage-99%25-brightgreen)](https://github.com/RudrenduPaul/agent-eval/actions)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval/badge)](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval)
 
 ---
@@ -23,6 +16,8 @@ pip install agent-regress
 # or
 uv add agent-regress
 ```
+
+---
 
 ## The problem this solves
 
@@ -137,12 +132,6 @@ def test_no_regression():
 uv run pytest test_regression.py
 ```
 
-Add the stability badge to your agent repo:
-
-```markdown
-[![agentregress](https://img.shields.io/badge/agentregress-stable-brightgreen)](https://github.com/RudrenduPaul/agent-eval)
-```
-
 ---
 
 ## How it differs from the alternatives
@@ -198,14 +187,7 @@ Measured on Apple M3 Pro, Python 3.14, scipy 1.15, numpy 2.2:
 | Bootstrap CI (1,000 resamples) | **26ms** | **31ms** |
 | Full compare() statistical overhead | **~27ms** | **~32ms** |
 
-Reproduce:
-
-```bash
-git clone https://github.com/RudrenduPaul/agent-eval
-cd agentregress
-uv sync --extra dev
-uv run pytest benchmarks/test_stat_overhead.py --benchmark-only -v
-```
+See [docs/benchmarks.md](docs/benchmarks.md) to reproduce.
 
 ---
 
@@ -226,18 +208,7 @@ uv run pytest benchmarks/test_stat_overhead.py --benchmark-only -v
 
 agentregress ships harnesses for the three standard agent benchmarks:
 
-**Tau-bench pass^k** measures reliability across k independent attempts. Single-run benchmarks miss degradation -- an agent that succeeds 65% of the time at k=1 reaches 97% at k=8. The k=1 vs k=8 curve is the signal.
-
-```python
-from agent_regress.benchmarks.tau_bench import TauBenchHarness
-
-harness = TauBenchHarness(agent=my_agent, dataset=tau_bench_dataset)
-results = harness.evaluate(k_values=[1, 4, 8])
-```
-
-**GAIA Level 1-3 split** stratifies by task difficulty. Overall accuracy hides per-difficulty regressions -- a prompt change that helps Level 1 often hurts Level 3.
-
-**SWE-bench scaffold score** isolates framework contribution from model contribution.
+**Tau-bench pass^k** measures reliability across k independent attempts — the k=1 vs k=8 curve is the signal. **GAIA Level 1-3 split** stratifies by task difficulty to catch per-level regressions hidden by overall accuracy. **SWE-bench scaffold score** isolates framework contribution from model contribution.
 
 See [leaderboard/README.md](leaderboard/README.md) to submit results.
 
@@ -247,11 +218,11 @@ See [leaderboard/README.md](leaderboard/README.md) to submit results.
 
 ```bash
 git clone https://github.com/RudrenduPaul/agent-eval
-cd agentregress
+cd agent-eval
 docker compose up
 ```
 
-Runs the basic comparison example inside a container, no local Python setup needed. Good for verifying the install works before wiring it into your own agent.
+Starts the leaderboard web server at `localhost:8080`. No local Python setup needed.
 
 ---
 
@@ -277,9 +248,9 @@ See [leaderboard/README.md](leaderboard/README.md).
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR
 - Good first issues are labeled in GitHub
 - Stats module (`src/agent_regress/stats/`) must stay pure Python + scipy -- no LLM calls, ever
-- All PRs require 95% coverage on `stats/`, 90% on `core/` and `ci/`
+- All PRs require 95% coverage on `stats/`, 80% overall
 
-GitHub Discussions for design questions. Discord for community: discord.gg/agentregress
+GitHub Discussions for design questions.
 
 Apache 2.0. Contributions welcome.
 
@@ -299,7 +270,7 @@ If you use agentregress in research, please cite:
 }
 ```
 
-Methodology pre-print: [docs/arxiv-preprint-draft.md](docs/arxiv-preprint-draft.md) (arXiv submission pending).
+Methodology: [docs/arxiv-preprint-draft.md](docs/arxiv-preprint-draft.md).
 
 ---
 
