@@ -254,7 +254,7 @@ See [docs/benchmarks.md](docs/benchmarks.md) to reproduce.
 
 Agent Evaluation ships harnesses for the three standard agent benchmarks:
 
-**Tau-bench pass^k** measures reliability across k independent attempts. Single-run benchmarks miss degradation: an agent that succeeds 65% of the time at k=1 reaches 97% at k=8. The k=1 vs k=8 curve is the signal.
+**Tau-bench pass^k** measures reliability across k independent attempts. Single-run benchmarks miss degradation: an agent that succeeds 60% of the time at k=1 reaches 99.93% at k=8. The k=1 vs k=8 curve is the signal.
 
 ```python
 from agent_regress.benchmarks.tau_bench import TauBenchHarness
