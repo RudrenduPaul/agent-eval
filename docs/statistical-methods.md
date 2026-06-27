@@ -1,6 +1,6 @@
 # Statistical Methods
 
-This document explains the statistical tests used by agentregress and why each one was chosen over the alternatives. Written for ML engineers, not statisticians.
+This document explains the statistical tests used by agent-eval and why each one was chosen over the alternatives. Written for ML engineers, not statisticians.
 
 ---
 
@@ -8,7 +8,7 @@ This document explains the statistical tests used by agentregress and why each o
 
 Standard evals ask: "Does this agent response meet a quality bar?"
 
-agentregress asks: "Are these two score distributions the same?"
+agent-eval asks: "Are these two score distributions the same?"
 
 These are different questions with different appropriate tests. Threshold-based evals use point estimates (is this score ≥ 0.7?). Distribution comparison requires inferential statistics.
 
@@ -45,9 +45,9 @@ result = stats.mannwhitneyu(arr_a, arr_b, alternative="two-sided", method="auto"
 
 `method="auto"` selects the exact permutation method when the sample sizes are small enough for the computation to be feasible without numerical overflow, and falls back to the asymptotic normal approximation (with tie correction) for very large n. In practice (scipy ≥ 1.13), exact is used for n ≤ ~500 per group; asymptotic kicks in for n ≥ 1000. Both methods are valid; the exact method is slightly more accurate for small samples with ties.
 
-When all observations are identical across both groups, the test is degenerate and scipy returns NaN. agentregress handles this by returning p=1.0 (no significant difference detected, which is correct).
+When all observations are identical across both groups (all-tied case), scipy returns a valid U statistic but a NaN p-value. agent-eval handles this by substituting p=1.0, which is correct: no significant difference is detectable. If the U statistic itself is NaN (caused by NaN values in the input data), agent-eval raises a `ValueError` — NaN scores indicate a data pipeline problem that should be fixed before running a comparison.
 
-**Warning threshold:** n < 30 per group. At n=30, Mann-Whitney has approximately 80% power to detect a medium effect (Cohen's d = 0.5) at α=0.05. Below n=30, you may miss real regressions. agentregress warns but does not fail the gate on insufficient data.
+**Warning threshold:** n < 30 per group. At n=30, Mann-Whitney has approximately 80% power to detect a medium effect (Cohen's d = 0.5) at α=0.05. Below n=30, you may miss real regressions. agent-eval warns but does not fail the gate on insufficient data.
 
 ---
 
@@ -108,7 +108,7 @@ s_p = sqrt(((n_A - 1) × var_A + (n_B - 1) × var_B) / (n_A + n_B - 2))
 
 ### The dual gate
 
-agentregress fails the CI gate only when **both**:
+agent-eval fails the CI gate only when **both**:
 
 - p < 0.05 (the shift is unlikely to be noise)
 - |d| ≥ 0.2 (the shift is large enough to be operationally meaningful)
@@ -126,7 +126,7 @@ report.assert_stable(
 
 ### Zero-variance case
 
-When all scores in both groups are identical (common in synthetic tests), the pooled std is 0. For n=1 per group, d is undefined and agentregress returns 0.0. For n>1 with equal within-group means but zero within-group variance, agentregress returns ±∞ (the groups are perfectly separated with no overlap -- the maximum possible effect).
+When all scores in both groups are identical (common in synthetic tests), the pooled std is 0. For n=1 per group, d is undefined and agent-eval returns 0.0. For n>1 with equal within-group means but zero within-group variance, agent-eval returns ±∞ (the groups are perfectly separated with no overlap -- the maximum possible effect).
 
 ---
 
@@ -156,7 +156,7 @@ The default `n_runs=50` gives approximately 80% power for medium effects and 40-
 
 **Warning at n < 30:** Below 30 runs per group, Mann-Whitney has < 50% power to detect medium effects. The warning message explicitly states what sample size is needed.
 
-**INSUFFICIENT_DATA at < 10 total scores:** Below 10 total scores per group, agentregress returns `Verdict.INSUFFICIENT_DATA` and `assert_stable()` does not raise, regardless of what the scores show. This prevents false positives from trivially small samples.
+**INSUFFICIENT_DATA at < 10 total scores:** Below 10 total scores per group, agent-eval returns `Verdict.INSUFFICIENT_DATA` and `assert_stable()` does not raise, regardless of what the scores show. This prevents false positives from trivially small samples.
 
 ---
 
