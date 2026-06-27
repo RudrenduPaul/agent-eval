@@ -2,7 +2,7 @@
 
 ## What "statistical regression" means here
 
-agentregress detects a statistically significant shift in agent behavior distribution
+agent-eval detects a statistically significant shift in agent behavior distribution
 between two versions.
 
 **It DOES mean:**
@@ -13,11 +13,11 @@ between two versions.
 **It DOES NOT mean:**
 - Every individual run in version B is worse
 - The agent is broken or unusable (REGRESSED is a statistical finding, not a severity judgment)
-- Explaining why behavior changed (agentregress detects; your team diagnoses)
+- Explaining why behavior changed (agent-eval detects; your team diagnoses)
 
 ## Mann-Whitney U test
 
-agentregress uses Mann-Whitney U rather than a t-test because:
+agent-eval uses Mann-Whitney U rather than a t-test because:
 
 1. Agent scores are often not normally distributed
 2. The U test makes no distributional assumptions
@@ -42,7 +42,7 @@ The default CI gate fails only when p less than 0.05 AND d is 0.2 or greater.
 The 95% CI shows the likely range of the true mean score delta. If the CI is [-0.22, -0.07],
 you can be 95% confident the true per-run score drop is between 7 and 22 percentage points.
 
-agentregress uses 1000 bootstrap resamples by default, seeded at 42 for reproducibility.
+agent-eval uses 1000 bootstrap resamples by default, seeded at 42 for reproducibility.
 
 ## Tau-bench pass^k
 

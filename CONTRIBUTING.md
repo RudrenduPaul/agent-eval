@@ -1,4 +1,4 @@
-# Contributing to agentregress
+# Contributing to agent-eval
 
 Thanks for your interest. This covers everything to go from zero to a merged PR.
 
@@ -14,8 +14,8 @@ We aim to review PRs within 72 hours (weekdays).
 ## Dev setup
 
 ```bash
-git clone https://github.com/RudrenduPaul/agentregress
-cd agentregress
+git clone https://github.com/RudrenduPaul/agent-eval
+cd agent-eval
 pip install uv
 uv sync --extra dev
 pre-commit install
@@ -53,4 +53,4 @@ uv run pytest tests/unit/ --cov=src/ --cov-fail-under=80
 
 ## Community
 
-Discord: discord.gg/agentregress (#contributing channel)
+Discord: discord.gg/agent-eval (#contributing channel)

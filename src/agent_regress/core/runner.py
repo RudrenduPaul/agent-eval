@@ -28,7 +28,7 @@ def run_suite(
     if n_runs < 1:
         raise ValueError(f"n_runs must be >= 1, got {n_runs}")
 
-    if n_runs < _MIN_STATISTICAL_N:
+    if n_runs < _MIN_RELIABLE_N:
         warnings.warn(
             f"n_runs={n_runs} is below the minimum for statistical validity "
             f"({_MIN_STATISTICAL_N}). "

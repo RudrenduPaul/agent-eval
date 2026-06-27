@@ -31,16 +31,22 @@ class Report:
     std_a: float
     std_b: float
     mean_delta: float
+    p_threshold: float = 0.05
+    min_effect: float = 0.2
     warnings: list[str] = field(default_factory=list)
 
     def assert_stable(
         self,
-        p_threshold: float = 0.05,
-        min_effect: float = 0.2,
+        p_threshold: float | None = None,
+        min_effect: float | None = None,
     ) -> None:
+        _p = p_threshold if p_threshold is not None else self.p_threshold
+        _e = min_effect if min_effect is not None else self.min_effect
         if self.verdict == Verdict.INSUFFICIENT_DATA:
             return
-        is_regression = self.p_value < p_threshold and self.effect_size <= -min_effect
+        is_regression = (
+            self.p_value < _p and self.effect_size < 0.0 and self.effect_size <= -_e
+        )
         if is_regression:
             if self.mean_a >= _NEAR_ZERO_THRESHOLD:
                 drop = f"{abs(self.mean_delta) / self.mean_a:.1%}"
@@ -58,7 +64,7 @@ class Report:
         lines = [
             "",
             _SEPARATOR,
-            f"agentregress Report -- {self.metric}",
+            f"agent-regress Report -- {self.metric}",
             _SEPARATOR,
             f"Verdict:    {self.verdict.value}",
             f"p-value:    {self.p_value:.4f}",

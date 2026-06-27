@@ -8,10 +8,10 @@ These 20 issues are ready to create on GitHub before the public launch. Create t
 
 **Labels:** `good first issue`, `enhancement`
 
-agentregress currently requires Python code to run comparisons. Add a lightweight CLI entry point that reads two JSONL files (each containing agent outputs as floats) and runs the statistical comparison without writing Python.
+agent-eval currently requires Python code to run comparisons. Add a lightweight CLI entry point that reads two JSONL files (each containing agent outputs as floats) and runs the statistical comparison without writing Python.
 
 ```bash
-agentregress compare --a outputs_v1.jsonl --b outputs_v2.jsonl --metric tool_accuracy
+agent-eval compare --a outputs_v1.jsonl --b outputs_v2.jsonl --metric tool_accuracy
 ```
 
 Files should contain one float score per line. This is a purely additive change -- no existing API changes needed.
@@ -153,7 +153,7 @@ Once Issue 1 (CLI) and Issue 4 (Report serialization) are merged, add `--export-
 
 **Labels:** `good first issue`, `testing`, `documentation`
 
-agentregress is tested on Linux and macOS. Run the unit tests on Windows (`uv run pytest tests/unit/ -q`) and document any failures. If tests pass: open a PR adding `windows-latest` to the CI matrix. If they fail: open an issue with the specific failure mode.
+agent-eval is tested on Linux and macOS. Run the unit tests on Windows (`uv run pytest tests/unit/ -q`) and document any failures. If tests pass: open a PR adding `windows-latest` to the CI matrix. If they fail: open an issue with the specific failure mode.
 
 ---
 
@@ -209,7 +209,7 @@ The Japanese and Chinese ML communities are significant consumers of OSS eval to
 
 **Labels:** `good first issue`, `documentation`
 
-Researchers often work in Jupyter notebooks. Add `examples/07-jupyter-notebook/agentregress-demo.ipynb` that walks through the basic comparison workflow step by step. Should produce the same structured output as example 01.
+Researchers often work in Jupyter notebooks. Add `examples/07-jupyter-notebook/agent-eval-demo.ipynb` that walks through the basic comparison workflow step by step. Should produce the same structured output as example 01.
 
 ---
 

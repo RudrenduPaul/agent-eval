@@ -1,4 +1,4 @@
-# agentregress: Statistical Regression Testing for LLM Agents
+# agent-eval: Statistical Regression Testing for LLM Agents
 
 **Rudrendu Paul, Sourav Nandy**
 
@@ -8,7 +8,7 @@
 
 ## Abstract
 
-We present agentregress, an open-source framework for statistical regression testing of large language model (LLM) agents. Current evaluation practice tests individual agent responses against fixed quality thresholds -- an approach that cannot detect whether behavior changed significantly between two agent versions under natural LLM output variance. We formalize the agent regression testing problem as a distributional comparison task and apply Mann-Whitney U with bootstrap confidence intervals to produce a p-value and effect size (Cohen's d) for any pair of agent versions. We introduce a dual-gate criterion that blocks deployment when p < 0.05 and |d| >= 0.2, substantially reducing false alarm rates relative to score-delta thresholds. We also introduce a Tau-bench pass^k harness that captures reliability degradation across multiple independent attempts -- a dimension absent from single-run benchmarks. The framework is self-hostable, integrates as a pytest step, and is licensed under Apache 2.0. All benchmark results are committed to a community-maintained leaderboard with independent reproduction requirements.
+We present agent-eval, an open-source framework for statistical regression testing of large language model (LLM) agents. Current evaluation practice tests individual agent responses against fixed quality thresholds -- an approach that cannot detect whether behavior changed significantly between two agent versions under natural LLM output variance. We formalize the agent regression testing problem as a distributional comparison task and apply Mann-Whitney U with bootstrap confidence intervals to produce a p-value and effect size (Cohen's d) for any pair of agent versions. We introduce a dual-gate criterion that blocks deployment when p < 0.05 and |d| >= 0.2, substantially reducing false alarm rates relative to score-delta thresholds. We also introduce a Tau-bench pass^k harness that captures reliability degradation across multiple independent attempts -- a dimension absent from single-run benchmarks. The framework is self-hostable, integrates as a pytest step, and is licensed under Apache 2.0. All benchmark results are committed to a community-maintained leaderboard with independent reproduction requirements.
 
 ---
 
@@ -32,7 +32,7 @@ We propose treating agent version comparison as a hypothesis testing problem. Gi
 
 4. We implement the Tau-bench pass^k harness with configurable k, enabling measurement of agent reliability degradation that single-run benchmarks cannot capture.
 
-5. We release agentregress as an open-source Python library with Apache 2.0 license, CI integration via pytest, and a community-governed benchmark leaderboard.
+5. We release agent-eval as an open-source Python library with Apache 2.0 license, CI integration via pytest, and a community-governed benchmark leaderboard.
 
 ---
 
@@ -42,9 +42,9 @@ We propose treating agent version comparison as a hypothesis testing problem. Gi
 
 **Statistical Testing in ML.** The application of statistical hypothesis testing to ML evaluation is established in NLP benchmarking [CITATION: Dror et al. 2018, Bender et al. 2021] and A/B testing for recommendation systems [CITATION]. A/B testing for dialog systems has been explored in [CITATION]. We adapt these methods specifically to the agent evaluation setting, accounting for the particular statistical properties of LLM score distributions.
 
-**Benchmark Reliability.** The unreliability of single-run LLM benchmarks is documented in [CITATION: Biderman et al. 2024, Polo et al. 2024]. Run-to-run variance in LLM evaluation is high enough that single-run scores are unreliable point estimates. agentregress addresses this by requiring N runs per version before drawing any statistical conclusion.
+**Benchmark Reliability.** The unreliability of single-run LLM benchmarks is documented in [CITATION: Biderman et al. 2024, Polo et al. 2024]. Run-to-run variance in LLM evaluation is high enough that single-run scores are unreliable point estimates. agent-eval addresses this by requiring N runs per version before drawing any statistical conclusion.
 
-**Tau-bench.** The Tau-bench benchmark [CITATION: Yao et al. 2024] introduces pass^k as a reliability metric for tool-use agents. We implement a configurable pass^k harness that integrates with the agentregress statistical comparison framework.
+**Tau-bench.** The Tau-bench benchmark [CITATION: Yao et al. 2024] introduces pass^k as a reliability metric for tool-use agents. We implement a configurable pass^k harness that integrates with the agent-eval statistical comparison framework.
 
 ---
 
@@ -216,13 +216,13 @@ Mock agent at 60% single-attempt success rate:
 
 ---
 
-## 8. The agentregress Leaderboard
+## 8. The agent-eval Leaderboard
 
-The `leaderboard/` directory in the agentregress repository version-controls Tau-bench pass^k, GAIA Level 1-3, and SWE-bench Verified results across models and frameworks. Any team can submit results by opening a pull request with a JSON file conforming to `leaderboard/schema.json`. Results are independently reproduced before merging.
+The `leaderboard/` directory in the agent-eval repository version-controls Tau-bench pass^k, GAIA Level 1-3, and SWE-bench Verified results across models and frameworks. Any team can submit results by opening a pull request with a JSON file conforming to `leaderboard/schema.json`. Results are independently reproduced before merging.
 
 **Why a git-committed leaderboard.** Git-committed leaderboards are auditable, forkable, and community-governed. Every submission is reviewed and reproduced. The schema validation runs in CI on every PR. This is the model used by Papers with Code and the MTEB leaderboard.
 
-**The MTEB analogy.** The MTEB embedding leaderboard (Muennighoff et al., 2022) drove adoption of sentence-transformers by becoming the canonical benchmark for embedding models: model builders who wanted to submit to MTEB had to use the sentence-transformers evaluation harness. We hypothesize an analogous dynamic for agent reliability benchmarking, where agentregress provides the harness and the leaderboard provides the submission target.
+**The MTEB analogy.** The MTEB embedding leaderboard (Muennighoff et al., 2022) drove adoption of sentence-transformers by becoming the canonical benchmark for embedding models: model builders who wanted to submit to MTEB had to use the sentence-transformers evaluation harness. We hypothesize an analogous dynamic for agent reliability benchmarking, where agent-eval provides the harness and the leaderboard provides the submission target.
 
 ---
 
@@ -247,7 +247,7 @@ def test_no_regression():
 
 ### 9.2 Framework Integrations
 
-agentregress provides runner adapters for LangGraph, OpenAI Agents SDK, CrewAI, and LangChain LCEL via optional dependencies. Each adapter wraps the framework's execution model behind the standard `(test_case: dict) -> score: float` callable interface, so the statistical comparison layer is framework-agnostic.
+agent-eval provides runner adapters for LangGraph, OpenAI Agents SDK, CrewAI, and LangChain LCEL via optional dependencies. Each adapter wraps the framework's execution model behind the standard `(test_case: dict) -> score: float` callable interface, so the statistical comparison layer is framework-agnostic.
 
 ---
 
@@ -265,7 +265,7 @@ agentregress provides runner adapters for LangGraph, OpenAI Agents SDK, CrewAI, 
 
 ## 11. Conclusion
 
-We have presented agentregress, a framework for statistical regression testing of LLM agents that applies Mann-Whitney U, bootstrap confidence intervals, and Cohen's d effect size to agent score distributions. The dual-gate criterion (p < 0.05 AND |d| >= 0.2) reduces false alarm rates relative to score-delta thresholds while maintaining sensitivity to operationally meaningful regressions. The Tau-bench pass^k harness extends this to reliability measurement across multiple independent attempts. We release agentregress under Apache 2.0 with a community-maintained benchmark leaderboard.
+We have presented agent-eval, a framework for statistical regression testing of LLM agents that applies Mann-Whitney U, bootstrap confidence intervals, and Cohen's d effect size to agent score distributions. The dual-gate criterion (p < 0.05 AND |d| >= 0.2) reduces false alarm rates relative to score-delta thresholds while maintaining sensitivity to operationally meaningful regressions. The Tau-bench pass^k harness extends this to reliability measurement across multiple independent attempts. We release agent-eval under Apache 2.0 with a community-maintained benchmark leaderboard.
 
 ---
 
@@ -282,6 +282,6 @@ We have presented agentregress, a framework for statistical regression testing o
 
 ---
 
-*agentregress is available at https://github.com/RudrenduPaul/agentregress under Apache 2.0.*
+*agent-eval is available at https://github.com/RudrenduPaul/agent-eval under Apache 2.0.*
 
 *Correspondence: rkpaul.venture@gmail.com*

@@ -49,7 +49,7 @@ Measures agent reliability across k independent attempts per task.
 | 4 | 1 - (0.4)^4 = 0.974 | ~0.97 |
 | 8 | 1 - (0.4)^8 = 0.9993 | ~0.999 |
 
-The k=1 headline number is insufficient. An agent that succeeds 60% of the time at k=1 looks unreliable; the same agent at k=8 succeeds 99.9% of the time. Single-run benchmarks measure k=1 only. agentregress measures the full curve.
+The k=1 headline number is insufficient. An agent that succeeds 60% of the time at k=1 looks unreliable; the same agent at k=8 succeeds 99.9% of the time. Single-run benchmarks measure k=1 only. agent-eval measures the full curve.
 
 To use with a real agent, replace `_mock_agent()` with your agent callable. The harness handles the k-repetition loop.
 

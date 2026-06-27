@@ -48,9 +48,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/RudrenduPaul/agentregress"
-Repository = "https://github.com/RudrenduPaul/agentregress"
-Issues = "https://github.com/RudrenduPaul/agentregress/issues"
+Homepage = "https://github.com/RudrenduPaul/agent-eval"
+Repository = "https://github.com/RudrenduPaul/agent-eval"
+Issues = "https://github.com/RudrenduPaul/agent-eval/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agent_regress"]

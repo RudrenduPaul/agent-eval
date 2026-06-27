@@ -8,7 +8,7 @@ from agent_regress.core.runner import AgentCallable
 
 
 def langchain_runner(chain: Any, input_key: str = "input") -> AgentCallable:
-    """Wrap a LangChain LCEL Runnable as an agentregress AgentCallable.
+    """Wrap a LangChain LCEL Runnable as an agent-regress AgentCallable.
 
     Args:
         chain: A LangChain Runnable (chain, pipeline, or agent) with .invoke().
@@ -32,6 +32,8 @@ def langchain_runner(chain: Any, input_key: str = "input") -> AgentCallable:
         )
 
     def _agent(test_case: dict[str, Any]) -> Any:
-        return chain.invoke({input_key: test_case.get(input_key, test_case)})
+        if input_key in test_case:
+            return chain.invoke({input_key: test_case[input_key]})
+        return chain.invoke(test_case)
 
     return _agent

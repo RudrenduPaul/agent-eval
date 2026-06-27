@@ -1,6 +1,6 @@
 {
   "model_name": "mock-baseline-agent-v1",
-  "framework": "agentregress-native",
+  "framework": "agent-eval-native",
   "submitted_by": "RudrenduPaul",
   "submitted_date": "2026-06-19",
   "reproduction_command": "uv run pytest benchmarks/test_tau_bench.py benchmarks/test_gaia.py benchmarks/test_swebench.py -v",
@@ -21,5 +21,5 @@
     "scaffold_pass_rate": 0.0,
     "n_instances": 10
   },
-  "notes": "Baseline submission using the mock agents from the agentregress benchmark harnesses. Not a real model -- establishes the leaderboard data format and validates the schema. Replace with real agent results to participate in the leaderboard."
+  "notes": "Baseline submission using the mock agents from the agent-eval benchmark harnesses. Not a real model -- establishes the leaderboard data format and validates the schema. Replace with real agent results to participate in the leaderboard."
 }

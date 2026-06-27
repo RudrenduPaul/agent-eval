@@ -9,10 +9,10 @@ import http.server
 import json
 import pathlib
 import socketserver
-from datetime import datetime
+from datetime import datetime, timezone
 
 PORT = 8080
-RESULTS_DIR = pathlib.Path("leaderboard/results")
+RESULTS_DIR = pathlib.Path(__file__).parent.parent / "leaderboard" / "results"
 
 
 def _load_results() -> list[dict]:
@@ -29,15 +29,18 @@ def _load_results() -> list[dict]:
 def _render_row(r: dict) -> str:
     tau = r.get("tau_bench", {})
     gaia = r.get("gaia", {})
-    swe = r.get("swe_bench", {})
+    swe = r.get("swebench", {})
 
-    tau_k1 = f"{tau.get('pass_at_1', '—'):.3f}" if isinstance(tau.get("pass_at_1"), float) else "—"
-    tau_k4 = f"{tau.get('pass_at_4', '—'):.3f}" if isinstance(tau.get("pass_at_4"), float) else "—"
-    tau_k8 = f"{tau.get('pass_at_8', '—'):.3f}" if isinstance(tau.get("pass_at_8"), float) else "—"
-    gaia_l1 = f"{gaia.get('level_1_accuracy', '—'):.3f}" if isinstance(gaia.get("level_1_accuracy"), float) else "—"
-    gaia_l2 = f"{gaia.get('level_2_accuracy', '—'):.3f}" if isinstance(gaia.get("level_2_accuracy"), float) else "—"
-    gaia_l3 = f"{gaia.get('level_3_accuracy', '—'):.3f}" if isinstance(gaia.get("level_3_accuracy"), float) else "—"
-    swe_rate = f"{swe.get('resolved_rate', '—'):.3f}" if isinstance(swe.get("resolved_rate"), float) else "—"
+    def _fmt(val: object) -> str:
+        return f"{val:.3f}" if isinstance(val, float) else "—"
+
+    tau_k1 = _fmt(tau.get("pass_at_1"))
+    tau_k4 = _fmt(tau.get("pass_at_4"))
+    tau_k8 = _fmt(tau.get("pass_at_8"))
+    gaia_l1 = _fmt(gaia.get("level_1_accuracy"))
+    gaia_l2 = _fmt(gaia.get("level_2_accuracy"))
+    gaia_l3 = _fmt(gaia.get("level_3_accuracy"))
+    swe_rate = _fmt(swe.get("scaffold_pass_rate"))
 
     return f"""
         <tr>
@@ -55,9 +58,14 @@ def _render_row(r: dict) -> str:
 
 
 def _render_page(results: list[dict]) -> str:
-    rows = "".join(_render_row(r) for r in results) if results else \
-        "<tr><td colspan='10' style='text-align:center;color:#888'>No results yet — submit via PR</td></tr>"
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    if results:
+        rows = "".join(_render_row(r) for r in results)
+    else:
+        rows = (
+            "<tr><td colspan='10' style='text-align:center;color:#888'>"
+            "No results yet — submit via PR</td></tr>"
+        )
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -129,7 +137,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         pass  # suppress per-request noise
 
 
+class _ReusableTCPServer(socketserver.TCPServer):
+    allow_reuse_address = True
+
+
 if __name__ == "__main__":
-    with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    with _ReusableTCPServer(("", PORT), Handler) as httpd:
         print(f"Leaderboard at http://localhost:{PORT}  (Ctrl+C to stop)")
         httpd.serve_forever()

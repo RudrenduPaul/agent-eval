@@ -8,7 +8,7 @@ from agent_regress.core.runner import AgentCallable
 
 
 def crewai_runner(crew: Any) -> AgentCallable:
-    """Wrap a CrewAI Crew as an agentregress AgentCallable.
+    """Wrap a CrewAI Crew as an agent-regress AgentCallable.
 
     Args:
         crew: A CrewAI Crew instance with a .kickoff(inputs=...) method.

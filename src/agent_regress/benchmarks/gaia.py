@@ -32,6 +32,8 @@ class GAIAHarness:
     dataset: list[dict[str, Any]]
 
     def _is_correct(self, output: Any, task: dict[str, Any]) -> bool:
+        if output is None:  # sentinel returned by _safe_run on exception
+            return False
         expected = task.get("expected_answer", "")
         return str(output).strip().lower() == str(expected).strip().lower()
 
@@ -53,9 +55,7 @@ class GAIAHarness:
             if not tasks:
                 continue
             correct = sum(
-                1
-                for task in tasks
-                if self._is_correct(self._safe_run(task), task)
+                1 for task in tasks if self._is_correct(self._safe_run(task), task)
             )
             results.append(
                 GAIALevelResult(
