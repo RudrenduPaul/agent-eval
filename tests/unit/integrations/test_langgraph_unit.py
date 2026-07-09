@@ -15,9 +15,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from agent_regress.core.runner import CACHE_BUST_NONCE_KEY
 from agent_regress.integrations.langgraph import (
+    _build_state,
     graph_has_cache,
     langgraph_async_runner,
+    langgraph_interrupt_resume_runner,
     langgraph_runner,
 )
 
@@ -25,6 +28,28 @@ from agent_regress.integrations.langgraph import (
 @pytest.fixture(autouse=True)
 def _fake_langgraph_module(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setitem(sys.modules, "langgraph", MagicMock())
+
+
+class _FakeCommand:
+    """Fake `langgraph.types.Command`, recording the resume value it got."""
+
+    def __init__(self, resume: Any = None) -> None:
+        self.resume = resume
+
+
+@pytest.fixture(autouse=True)
+def _fake_langgraph_types_module(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Fake `langgraph.types` exposing a fake `Command`.
+
+    `langgraph_interrupt_resume_runner()` does `from langgraph.types import
+    Command`; since `sys.modules["langgraph"]` is faked to a bare MagicMock
+    (no real `__path__`), the submodule import must also be pre-registered
+    in `sys.modules` or Python's import machinery would try (and fail) to
+    resolve `langgraph.types` against the fake package.
+    """
+    monkeypatch.setitem(
+        sys.modules, "langgraph.types", SimpleNamespace(Command=_FakeCommand)
+    )
 
 
 class _FakeGraph:
@@ -94,6 +119,79 @@ class _FakeAsyncGraph:
         return {"result": "ok", "call_index": len(self.calls) - 1}
 
 
+class _FakeAsyncCheckpointGraph:
+    """Fake async graph exposing checkpoint-surgery methods (no .ainvoke needed here)."""
+
+    def __init__(self) -> None:
+        self.bulk_update_calls: list[tuple[Any, Any]] = []
+
+    async def ainvoke(
+        self, state: dict[str, Any], config: dict[str, Any] | None = None
+    ) -> Any:
+        raise AssertionError("ainvoke() should not be called when operation= is set")
+
+    async def abulk_update_state(self, config: Any, updates: Any) -> str:
+        self.bulk_update_calls.append((config, updates))
+        return "bulk-updated"
+
+
+class _FakeSnapshot:
+    """Fake `langgraph.types.StateSnapshot` (the fields this integration reads)."""
+
+    def __init__(
+        self,
+        next_nodes: tuple[str, ...] = (),
+        interrupts: tuple[Any, ...] = (),
+        tasks: tuple[Any, ...] = (),
+    ) -> None:
+        self.next = next_nodes
+        self.interrupts = interrupts
+        self.tasks = tasks
+
+
+class _FakeTask:
+    """Fake `langgraph.types.PregelTask` (only the `.interrupts` field matters here)."""
+
+    def __init__(self, interrupts: tuple[Any, ...] = ()) -> None:
+        self.interrupts = interrupts
+
+
+class _FakeInterruptResumeGraph:
+    """Fake graph exercising the interrupt-then-resume cycle.
+
+    First `.invoke()` call always returns a single `call-1` tool message.
+    `.get_state()` reports interrupted (or not) per `interrupted_after_first_invoke`.
+    A second `.invoke()` call (the resume, called with a `Command` instance
+    as `state`) returns a `call-1` + `call-2` trace by default — override via
+    subclassing to simulate a buggy double-execution.
+    """
+
+    def __init__(self, interrupted_after_first_invoke: bool) -> None:
+        self.invoke_calls: list[dict[str, Any]] = []
+        self.get_state_calls: list[dict[str, Any] | None] = []
+        self.interrupted_after_first_invoke = interrupted_after_first_invoke
+
+    def invoke(self, state: Any, config: dict[str, Any] | None = None) -> Any:
+        call_index = len(self.invoke_calls)
+        self.invoke_calls.append({"state": state, "config": config})
+        if call_index == 0:
+            return {"messages": [{"tool_call_id": "call-1"}], "call_index": call_index}
+        return {
+            "messages": [{"tool_call_id": "call-1"}, {"tool_call_id": "call-2"}],
+            "call_index": call_index,
+        }
+
+    def get_state(self, config: dict[str, Any] | None) -> _FakeSnapshot:
+        self.get_state_calls.append(config)
+        if self.interrupted_after_first_invoke:
+            return _FakeSnapshot(
+                next_nodes=("tool_node",),
+                interrupts=({"value": "paused"},),
+                tasks=(_FakeTask(interrupts=({"value": "paused"},)),),
+            )
+        return _FakeSnapshot()
+
+
 class TestBackwardCompatibility:
     def test_default_behavior_matches_original_invoke_only(self) -> None:
         graph = _FakeGraph()
@@ -114,6 +212,70 @@ class TestBackwardCompatibility:
         agent = langgraph_runner(graph, input_key="query")
         agent({"query": "hello", "expected": "world"})
         assert graph.calls[0]["state"] == {"query": "hello"}
+
+
+class TestBuildStateCacheBustNonce:
+    """`_build_state()` must preserve CACHE_BUST_NONCE_KEY through narrowing.
+
+    Regression test for the bug reported by @nfcampos: when `input_key` is
+    present in `test_case`, `_build_state()` used to return only
+    `{input_key: ...}`, silently dropping every other key — including a
+    cache-bust nonce injected by `run_suite(cache_bust_key_fn=...)` under
+    `CACHE_BUST_NONCE_KEY`. That defeated cache-busting for any LangGraph
+    runner whose test cases carry `input_key`.
+    """
+
+    def test_nonce_preserved_alongside_input_key_when_both_present(self) -> None:
+        test_case = {
+            "messages": ["hi"],
+            "expected": "ignored",
+            CACHE_BUST_NONCE_KEY: "nonce-123",
+        }
+        state = _build_state(test_case, "messages")
+        assert state == {
+            "messages": ["hi"],
+            CACHE_BUST_NONCE_KEY: "nonce-123",
+        }
+
+    def test_narrowing_unchanged_when_nonce_absent(self) -> None:
+        test_case = {"messages": ["hi"], "expected": "ignored"}
+        state = _build_state(test_case, "messages")
+        assert state == {"messages": ["hi"]}
+        assert CACHE_BUST_NONCE_KEY not in state
+
+    def test_full_test_case_passthrough_unaffected_when_input_key_missing(
+        self,
+    ) -> None:
+        test_case = {"other_key": "value", CACHE_BUST_NONCE_KEY: "nonce-456"}
+        state = _build_state(test_case, "messages")
+        assert state is test_case
+        assert state[CACHE_BUST_NONCE_KEY] == "nonce-456"
+
+    def test_nonce_flows_through_langgraph_runner_invoke(self) -> None:
+        graph = _FakeGraph()
+        agent = langgraph_runner(graph, input_key="messages")
+        test_case = {
+            "messages": ["hi"],
+            CACHE_BUST_NONCE_KEY: "nonce-789",
+        }
+        agent(test_case)
+        assert graph.calls[0]["state"] == {
+            "messages": ["hi"],
+            CACHE_BUST_NONCE_KEY: "nonce-789",
+        }
+
+    def test_nonce_flows_through_langgraph_async_runner_ainvoke(self) -> None:
+        graph = _FakeAsyncGraph()
+        agent = langgraph_async_runner(graph, input_key="messages")
+        test_case = {
+            "messages": ["hi"],
+            CACHE_BUST_NONCE_KEY: "nonce-async",
+        }
+        asyncio.run(agent(test_case))
+        assert graph.calls[0]["state"] == {
+            "messages": ["hi"],
+            CACHE_BUST_NONCE_KEY: "nonce-async",
+        }
 
 
 class TestConfigContextPassthrough:
@@ -344,6 +506,154 @@ class TestLanggraphAsyncRunner:
         assert len(graph.calls) == 6
 
 
+class TestAsyncOperationHook:
+    def test_operation_called_instead_of_ainvoke(self) -> None:
+        graph = _FakeAsyncCheckpointGraph()
+        test_case = {"config": {"configurable": {"thread_id": "t1"}}, "updates": [({}, {})]}
+        agent = langgraph_async_runner(
+            graph,
+            operation=lambda g, tc: g.abulk_update_state(tc["config"], tc["updates"]),
+        )
+        result = asyncio.run(agent(test_case))
+        assert result == "bulk-updated"
+        assert graph.bulk_update_calls == [(test_case["config"], test_case["updates"])]
+
+    def test_operation_bypasses_ainvoke_entirely(self) -> None:
+        graph = _FakeAsyncCheckpointGraph()
+        agent = langgraph_async_runner(
+            graph,
+            operation=lambda g, tc: g.abulk_update_state(tc["config"], tc["updates"]),
+        )
+        # graph.ainvoke would raise AssertionError if awaited; this must not raise.
+        result = asyncio.run(agent({"config": "cfg-1", "updates": [({}, {})]}))
+        assert result == "bulk-updated"
+
+    def test_operation_none_default_uses_ainvoke(self) -> None:
+        graph = _FakeAsyncGraph()
+        agent = langgraph_async_runner(graph, operation=None)
+        result = asyncio.run(agent({"messages": ["hi"]}))
+        assert result == {"result": "ok", "call_index": 0}
+
+
+class TestInterruptResumeRunner:
+    def test_no_interrupt_single_invoke_no_resume(self) -> None:
+        graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=False)
+        agent = langgraph_interrupt_resume_runner(graph)
+        result = agent({"messages": ["hi"]})
+
+        assert len(graph.invoke_calls) == 1
+        assert len(graph.get_state_calls) == 1
+        assert result["interrupted"] is False
+        assert result["result"] == {
+            "messages": [{"tool_call_id": "call-1"}],
+            "call_index": 0,
+        }
+        assert result["messages"] == [{"tool_call_id": "call-1"}]
+
+    def test_interrupt_then_resume_invokes_twice_with_command(self) -> None:
+        graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=True)
+        agent = langgraph_interrupt_resume_runner(graph, resume_value="go-ahead")
+        result = agent({"messages": ["hi"]})
+
+        assert len(graph.invoke_calls) == 2
+        assert result["interrupted"] is True
+
+        resume_arg = graph.invoke_calls[1]["state"]
+        assert isinstance(resume_arg, _FakeCommand)
+        assert resume_arg.resume == "go-ahead"
+
+        assert result["result"]["call_index"] == 1
+        assert result["messages"] == [
+            {"tool_call_id": "call-1"},
+            {"tool_call_id": "call-2"},
+        ]
+
+    def test_returned_dict_shape(self) -> None:
+        graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=False)
+        agent = langgraph_interrupt_resume_runner(graph)
+        result = agent({"messages": ["hi"]})
+
+        assert set(result.keys()) == {"result", "interrupted", "messages"}
+        assert isinstance(result["interrupted"], bool)
+
+    def test_thread_id_stable_across_invoke_and_resume_calls(self) -> None:
+        graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=True)
+        agent = langgraph_interrupt_resume_runner(graph)
+        agent({"messages": ["hi"]})
+
+        thread_ids = {
+            call["config"]["configurable"]["thread_id"] for call in graph.invoke_calls
+        }
+        get_state_thread_ids = {
+            call["configurable"]["thread_id"] for call in graph.get_state_calls if call
+        }
+        assert len(thread_ids) == 1
+        assert thread_ids == get_state_thread_ids
+
+    def test_thread_id_differs_across_test_cases(self) -> None:
+        graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=False)
+        agent = langgraph_interrupt_resume_runner(graph)
+        agent({"messages": ["a"]})
+        agent({"messages": ["b"]})
+
+        thread_id_a = graph.invoke_calls[0]["config"]["configurable"]["thread_id"]
+        thread_id_b = graph.invoke_calls[1]["config"]["configurable"]["thread_id"]
+        assert thread_id_a != thread_id_b
+
+    def test_explicit_thread_id_in_config_is_preserved(self) -> None:
+        graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=False)
+        base_config = {"configurable": {"thread_id": "custom-thread"}}
+        agent = langgraph_interrupt_resume_runner(graph, config=base_config)
+        agent({"messages": ["hi"]})
+
+        assert (
+            graph.invoke_calls[0]["config"]["configurable"]["thread_id"]
+            == "custom-thread"
+        )
+        # Original base_config dict passed by caller must remain untouched.
+        assert base_config == {"configurable": {"thread_id": "custom-thread"}}
+
+    def test_result_usable_with_tool_call_trace_scorer_for_double_execution(
+        self,
+    ) -> None:
+        from agent_regress.core.scorer import tool_call_trace_scorer
+
+        class _DoubleExecutionGraph(_FakeInterruptResumeGraph):
+            def invoke(
+                self, state: Any, config: dict[str, Any] | None = None
+            ) -> Any:
+                call_index = len(self.invoke_calls)
+                self.invoke_calls.append({"state": state, "config": config})
+                if call_index == 0:
+                    return {"messages": [{"tool_call_id": "call-1"}]}
+                # Buggy node: re-executes call-1 instead of moving on.
+                return {
+                    "messages": [
+                        {"tool_call_id": "call-1"},
+                        {"tool_call_id": "call-1"},
+                    ]
+                }
+
+        graph = _DoubleExecutionGraph(interrupted_after_first_invoke=True)
+        agent = langgraph_interrupt_resume_runner(graph)
+        result = agent({"messages": ["hi"]})
+
+        test_case = {"expected_tool_call_ids": ["call-1"]}
+        score = tool_call_trace_scorer(result, test_case)
+        assert score == 0.0  # call-1 appears twice -> double-execution caught
+
+    def test_no_double_execution_scores_full_marks(self) -> None:
+        from agent_regress.core.scorer import tool_call_trace_scorer
+
+        graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=True)
+        agent = langgraph_interrupt_resume_runner(graph)
+        result = agent({"messages": ["hi"]})
+
+        test_case = {"expected_tool_call_ids": ["call-1", "call-2"]}
+        score = tool_call_trace_scorer(result, test_case)
+        assert score == 1.0
+
+
 class TestImportGuard:
     def test_missing_langgraph_raises_import_error(
         self, monkeypatch: pytest.MonkeyPatch
@@ -360,6 +670,14 @@ class TestImportGuard:
         graph = _FakeAsyncGraph()
         with pytest.raises(ImportError, match="pip install agent-regress\\[langgraph\\]"):
             langgraph_async_runner(graph)
+
+    def test_missing_langgraph_raises_import_error_for_interrupt_resume_runner(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setitem(sys.modules, "langgraph", None)
+        graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=False)
+        with pytest.raises(ImportError, match="pip install agent-regress\\[langgraph\\]"):
+            langgraph_interrupt_resume_runner(graph)
 
 
 class TestWithRunSuite:

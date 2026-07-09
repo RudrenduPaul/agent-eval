@@ -12,6 +12,24 @@ from typing import Any
 
 _MIN_STATISTICAL_N = 10
 _MIN_RELIABLE_N = 30
+_NEAR_ZERO_VARIANCE_TOLERANCE = 1e-9
+
+CACHE_BUST_NONCE_KEY = "_cache_bust_nonce"
+"""Reserved key name a `cache_bust_key_fn` should inject its nonce under.
+
+`run_suite(cache_bust_key_fn=...)` merges whatever dict `cache_bust_key_fn`
+returns into the test case before calling `agent(...)` (see `run_suite`'s
+docstring). Downstream integrations that narrow a test case down to a
+framework-specific input shape (e.g.
+`agent_regress.integrations.langgraph._build_state()`, which projects the
+test case down to a single `input_key` such as `"messages"`) need a single,
+predictable key name to preserve through that narrowing so the cache-bust
+nonce survives. Injecting the nonce under `CACHE_BUST_NONCE_KEY` (rather
+than an arbitrary key of the caller's choosing) is what lets integration
+code special-case exactly one key and still guarantee the nonce reaches the
+system under test, regardless of which top-level keys get dropped
+otherwise.
+"""
 
 AgentCallable = Callable[[dict[str, Any]], Any]
 AsyncAgentCallable = Callable[[dict[str, Any]], Awaitable[Any]]
@@ -99,13 +117,34 @@ def run_suite(  # noqa: PLR0913
             `run_suite` builds `augmented_case = {**test_case,
             **cache_bust_key_fn(test_case, run_index)}` and passes that to
             `agent(...)` instead of the raw `test_case`. Use this to inject a
-            per-run nonce field (e.g. a random UUID under a `_cache_bust`
-            key) that a wrapped agent can thread through to the underlying
-            system under test to defeat SUT-side caching (e.g. LangGraph
-            node/task `cache_policy`), which would otherwise silently
-            collapse repeated-sampling variance. Defaults to `None`, which
-            preserves current behavior exactly: the agent always receives
-            the raw `test_case`.
+            per-run nonce field that a wrapped agent can thread through to
+            the underlying system under test to defeat SUT-side caching
+            (e.g. LangGraph node/task `cache_policy`), which would otherwise
+            silently collapse repeated-sampling variance. Inject the nonce
+            under the reserved `CACHE_BUST_NONCE_KEY` constant (exported
+            from this module) rather than an arbitrary key name, e.g.:
+
+                import uuid
+                from agent_regress.core.runner import (
+                    CACHE_BUST_NONCE_KEY,
+                    run_suite,
+                )
+
+                run_suite(
+                    agent,
+                    test_suite,
+                    cache_bust_key_fn=lambda tc, i: {
+                        CACHE_BUST_NONCE_KEY: str(uuid.uuid4())
+                    },
+                )
+
+            Integrations that narrow a test case down to a framework-specific
+            input shape (e.g. `agent_regress.integrations.langgraph`'s state
+            builder, which projects the test case down to a single input
+            key) special-case `CACHE_BUST_NONCE_KEY` to preserve it through
+            that narrowing, so the nonce still reaches the system under
+            test. Defaults to `None`, which preserves current behavior
+            exactly: the agent always receives the raw `test_case`.
 
     Returns:
         Flat list of scores across all test cases and all runs.
@@ -146,9 +185,11 @@ def run_suite(  # noqa: PLR0913
         for fut in concurrent.futures.as_completed(futures):
             all_scores.extend(fut.result())
 
-    if len(set(all_scores)) == 1 and n_runs >= _MIN_STATISTICAL_N:
+    score_range = max(all_scores) - min(all_scores)
+    if score_range < _NEAR_ZERO_VARIANCE_TOLERANCE and n_runs >= _MIN_STATISTICAL_N:
         warnings.warn(
-            "All scores returned by run_suite() are identical across every "
+            "All scores returned by run_suite() are identical (or "
+            "near-identical, within floating-point noise) across every "
             f"test case and all n_runs={n_runs} runs. This is statistically "
             "implausible unless the system under test is fully deterministic "
             "and cached. Check for SUT-side caching (e.g. LangGraph node/task "
@@ -263,12 +304,13 @@ async def arun_suite(  # noqa: PLR0913
     for case_scores in per_case_results:
         all_scores.extend(case_scores)
 
-    if len(set(all_scores)) == 1 and n_runs >= _MIN_STATISTICAL_N:
+    score_range = max(all_scores) - min(all_scores)
+    if score_range < _NEAR_ZERO_VARIANCE_TOLERANCE and n_runs >= _MIN_STATISTICAL_N:
         warnings.warn(
             "All scores returned by arun_suite() are identical across every "
-            f"test case and all n_runs={n_runs} runs. This is statistically "
-            "implausible unless the system under test is fully deterministic "
-            "and cached.",
+            f"test case and all n_runs={n_runs} runs (or vary by less than "
+            "floating-point noise). This is statistically implausible unless "
+            "the system under test is fully deterministic and cached.",
             UserWarning,
             stacklevel=2,
         )

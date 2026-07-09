@@ -91,6 +91,63 @@ agent = langgraph_runner(
 )
 ```
 
+`langgraph_async_runner` takes the same `operation` parameter -- an async
+`(graph, test_case) -> Awaitable[Any]` callable -- so async checkpoint-surgery
+methods like `abulk_update_state` are reachable through
+`arun_suite()`/`concurrent_cancellation_probe()` too, not just via the
+synchronous runner:
+
+```python
+agent = langgraph_async_runner(
+    graph,
+    operation=lambda g, tc: g.abulk_update_state(tc["config"], tc["updates"]),
+)
+```
+
+As with `langgraph_runner`, when `operation` is given, `input_key`/`store`/
+`config`/`context` are ignored for that call.
+
+## Interrupt / resume, checking for double-execution
+
+`langgraph_runner`'s `operation=`/`thread_aware=` params already let you
+hand-roll an interrupt-then-resume test, but for the common case -- "does a
+node re-execute a tool call after a resume?" (the risk class behind
+LangGraph PR #3126, "allow ToolNode to accept ToolCalls") -- use
+`langgraph_interrupt_resume_runner`, a built-in convenience that does the
+whole cycle for you:
+
+```python
+from agent_regress.integrations.langgraph import langgraph_interrupt_resume_runner
+from agent_regress.core.scorer import tool_call_trace_scorer
+
+agent = langgraph_interrupt_resume_runner(graph, resume_value="approved")
+
+result = agent({"messages": [...], "expected_tool_call_ids": ["call-1", "call-2"]})
+# result == {"result": <final invoke() return value>, "interrupted": bool,
+#            "messages": <final result["messages"] if present, else None>}
+
+score = tool_call_trace_scorer(result, test_case)
+```
+
+Per test case it: (1) calls `graph.invoke(state, config=call_config)` once,
+with an auto-generated, per-test-case-stable `thread_id` injected into
+`call_config["configurable"]["thread_id"]` (unless your `config=` already
+supplies one); (2) calls `graph.get_state(call_config)` and checks whether
+the graph actually paused at an `interrupt()` -- verified against the
+installed LangGraph source (`langgraph.types.StateSnapshot`): non-empty
+`.next`, non-empty `.interrupts`, or any task in `.tasks` with a non-empty
+`.interrupts`; (3) if interrupted, resumes via
+`graph.invoke(Command(resume=resume_value), config=call_config)` (`Command`
+from `langgraph.types`); (4) returns the dict shown above. Because
+`tool_call_trace_scorer` reads `output["messages"]` directly, you can pass
+this dict straight to it as `output` -- if a tool node re-executed after
+resume, the repeated `tool_call_id` scores below `1.0`.
+
+If the input never triggers an `interrupt()`, step 3 is skipped and
+`interrupted=False` comes back -- that's a real result, not an error. Only
+one interrupt/resume cycle is exercised per call; a graph that interrupts
+more than once will only have its first pause resumed.
+
 ## Detecting node/task-level caching (avoid collapsed repeated-sampling variance)
 
 LangGraph supports a per-node/task `cache_policy` that caches results keyed
@@ -124,15 +181,18 @@ for callers deciding whether to pass `cache_bust_key_fn` to `run_suite`.
 If caching is present (or even suspected), pass `cache_bust_key_fn` to
 `run_suite` to inject a per-run nonce field into the test case before each
 call, which your graph/agent wrapper can thread through to defeat the
-SUT-side cache:
+SUT-side cache. Inject the nonce under the reserved `CACHE_BUST_NONCE_KEY`
+constant (not an arbitrary key name) -- `langgraph_runner` and
+`langgraph_async_runner` both special-case that exact key so it survives
+`input_key` narrowing (see below) and still reaches the graph:
 
 ```python
 import uuid
 
-from agent_regress.core.runner import run_suite
+from agent_regress.core.runner import CACHE_BUST_NONCE_KEY, run_suite
 
 def bust_cache(test_case: dict, run_index: int) -> dict:
-    return {"_cache_bust": str(uuid.uuid4())}
+    return {CACHE_BUST_NONCE_KEY: str(uuid.uuid4())}
 
 scores = run_suite(
     agent,
@@ -148,6 +208,17 @@ test case and every run comes back byte-identical with `n_runs >= 10` --
 that pattern is statistically implausible for anything but a fully
 cached/deterministic-and-cached system under test, and the warning message
 points you at `cache_bust_key_fn` as the fix.
+
+**Why the reserved key matters:** both `langgraph_runner` and
+`langgraph_async_runner` build the graph's input state by narrowing the test
+case down to a single `input_key` field (e.g. `{"messages": ...}`) when that
+key is present -- every other top-level key is dropped by design. Without a
+predictable name to special-case, a `cache_bust_key_fn`-injected nonce would
+be silently dropped by that same narrowing, defeating cache-busting entirely
+for any test suite whose cases carry `input_key`. Both runners preserve
+`CACHE_BUST_NONCE_KEY` specifically through the narrowing (alongside
+`input_key`) so this failure mode can't happen as long as you inject the
+nonce under that constant.
 
 ## Async runner
 
@@ -191,6 +262,47 @@ result = await concurrent_cancellation_probe(
 )
 # {"completed": 14, "cancelled": 6, "failed": 0}
 ```
+
+A single `concurrent_cancellation_probe()` call only gives you one batch's
+counts, not a statistically-grounded verdict on whether a code change made
+liveness under cancellation better or worse. `compare_liveness()` runs the
+probe repeatedly against two agents and turns the resulting distributions
+into a `Report`, the same way `compare()` does for scalar scores -- use it
+to regression-test a queue/session liveness fix (e.g. a fix for a shared
+async batch queue that used to get permanently poisoned by a cancelled
+future) the same way you'd regression-test accuracy:
+
+```python
+from agent_regress.core.compare import compare_liveness
+from agent_regress.integrations.langgraph import langgraph_async_runner
+
+# graph_before: pre-fix build (susceptible to queue poisoning on cancellation)
+# graph_after: post-fix build
+agent_before = langgraph_async_runner(graph_before)
+agent_after = langgraph_async_runner(graph_after)
+
+report = await compare_liveness(
+    agent_a=agent_before,
+    agent_b=agent_after,
+    test_case=test_case,
+    n_concurrent=20,
+    cancel_fraction=0.3,
+    n_trials=30,
+)
+print(report)
+```
+
+Each trial reduces one `concurrent_cancellation_probe()` call to a single
+liveness score, `completed / n_concurrent` -- the fraction of the batch
+that finished successfully despite the injected cancellations. A queue that
+gets permanently poisoned by a cancelled future drives this toward 0 even
+for calls that were never themselves cancelled, so `agent_a`/`agent_b`
+here play the same "baseline vs. candidate" role `version_a`/`version_b`
+play in `compare()`: if the post-fix graph is reliably more live under
+concurrent cancellation, `report.verdict` comes back `Verdict.IMPROVED`
+(same p-value/effect-size thresholding and `INSUFFICIENT_DATA`-below-10
+rule `compare()` uses); if a change to the graph regresses liveness,
+you'll see `Verdict.REGRESSED` instead.
 
 ### Store wiring (best-effort)
 

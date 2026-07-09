@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import warnings
 from typing import Any
 
 import pytest
 
 from agent_regress import compare
+from agent_regress.core.compare import compare_liveness
 from agent_regress.core.report import Verdict
 
 
@@ -20,6 +22,37 @@ def _fixed_agent(score: float) -> Any:
 
 SUITE_5 = [{"query": f"q{i}", "expected": f"a{i}"} for i in range(5)]
 SUITE_3 = [{"query": f"q{i}", "expected": f"a{i}"} for i in range(3)]
+
+
+def _make_healthy_async_agent() -> Any:
+    """An agent that always completes, unless cancelled mid-flight."""
+
+    async def _agent(tc: dict[str, Any]) -> str:
+        await asyncio.sleep(0.01)
+        return "ok"
+
+    return _agent
+
+
+def _make_poisoned_queue_agent() -> Any:
+    """Simulates a shared async batch queue permanently poisoned by a
+    cancelled future: once any concurrent call is cancelled mid-flight, the
+    rest of the *same and every later* batch starts failing too, even calls
+    that were never themselves cancelled.
+    """
+    poisoned = asyncio.Event()
+
+    async def _agent(tc: dict[str, Any]) -> str:
+        try:
+            await asyncio.sleep(0.02)
+        except asyncio.CancelledError:
+            poisoned.set()
+            raise
+        if poisoned.is_set():
+            raise RuntimeError("shared batch queue poisoned by a cancelled peer")
+        return "ok"
+
+    return _agent
 
 
 class TestCompare:
@@ -187,3 +220,118 @@ class TestCompare:
         )
         with pytest.raises(AssertionError, match="REGRESSED"):
             report.assert_stable()
+
+
+class TestCompareLiveness:
+    def test_regressed_for_poisoned_queue_agent(self) -> None:
+        healthy = _make_healthy_async_agent()
+        poisoned = _make_poisoned_queue_agent()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            report = asyncio.run(
+                compare_liveness(
+                    agent_a=healthy,
+                    agent_b=poisoned,
+                    test_case={"query": "x"},
+                    n_concurrent=20,
+                    cancel_fraction=0.3,
+                    n_trials=30,
+                )
+            )
+
+        assert report.verdict == Verdict.REGRESSED
+        assert report.effect_size < 0.0
+        assert report.mean_b < report.mean_a
+        assert report.metric == "liveness"
+
+    def test_stable_when_both_agents_behave_the_same(self) -> None:
+        agent_a = _make_healthy_async_agent()
+        agent_b = _make_healthy_async_agent()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            report = asyncio.run(
+                compare_liveness(
+                    agent_a=agent_a,
+                    agent_b=agent_b,
+                    test_case={"query": "x"},
+                    n_concurrent=20,
+                    cancel_fraction=0.3,
+                    n_trials=30,
+                )
+            )
+
+        assert report.verdict == Verdict.STABLE
+        assert report.mean_a == pytest.approx(report.mean_b)
+
+    def test_insufficient_data_when_n_trials_below_ten(self) -> None:
+        agent_a = _make_healthy_async_agent()
+        agent_b = _make_healthy_async_agent()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            report = asyncio.run(
+                compare_liveness(
+                    agent_a=agent_a,
+                    agent_b=agent_b,
+                    test_case={"query": "x"},
+                    n_concurrent=10,
+                    cancel_fraction=0.3,
+                    n_trials=5,
+                )
+            )
+
+        assert report.verdict == Verdict.INSUFFICIENT_DATA
+
+    def test_invalid_n_trials_raises(self) -> None:
+        agent = _make_healthy_async_agent()
+        with pytest.raises(ValueError, match="n_trials must be >= 1"):
+            asyncio.run(
+                compare_liveness(
+                    agent_a=agent,
+                    agent_b=agent,
+                    test_case={"query": "x"},
+                    n_trials=0,
+                )
+            )
+
+    def test_invalid_p_threshold_raises(self) -> None:
+        agent = _make_healthy_async_agent()
+        with pytest.raises(ValueError, match="p_threshold"):
+            asyncio.run(
+                compare_liveness(
+                    agent_a=agent,
+                    agent_b=agent,
+                    test_case={"query": "x"},
+                    p_threshold=1.5,
+                )
+            )
+
+    def test_invalid_min_effect_raises(self) -> None:
+        agent = _make_healthy_async_agent()
+        with pytest.raises(ValueError, match="min_effect"):
+            asyncio.run(
+                compare_liveness(
+                    agent_a=agent,
+                    agent_b=agent,
+                    test_case={"query": "x"},
+                    min_effect=-0.1,
+                )
+            )
+
+    def test_warns_on_small_n_trials(self) -> None:
+        agent = _make_healthy_async_agent()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            asyncio.run(
+                compare_liveness(
+                    agent_a=agent,
+                    agent_b=agent,
+                    test_case={"query": "x"},
+                    n_concurrent=10,
+                    n_trials=15,
+                )
+            )
+        msgs = " ".join(str(warning.message) for warning in w)
+        assert "insufficient" in msgs.lower() or "50" in msgs

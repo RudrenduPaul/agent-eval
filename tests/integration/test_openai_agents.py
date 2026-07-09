@@ -201,6 +201,310 @@ def test_openai_agents_runner_session_factory_passthrough(
     assert len(factory_calls) == 1
 
 
+def test_openai_agents_runner_session_aware_reuses_session_per_test_case(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`session_aware=True` builds one session per logical test case (id-keyed)."""
+    agents = pytest.importorskip("agents")
+    from agent_regress.integrations.openai_agents import openai_agents_runner
+
+    factory_calls: list[object] = []
+
+    def _factory() -> object:
+        session = object()
+        factory_calls.append(session)
+        return session
+
+    captured_sessions: list[Any] = []
+
+    class _FakeResult:
+        final_output = "ok"
+
+    async def _fake_run(starting_agent: Any, input: Any, **kwargs: Any) -> _FakeResult:
+        captured_sessions.append(kwargs["session"])
+        return _FakeResult()
+
+    monkeypatch.setattr(agents.Runner, "run", _fake_run)
+
+    agent = agents.Agent(name="session-aware-agent", instructions="be helpful")
+    runner = openai_agents_runner(agent, session_factory=_factory, session_aware=True)
+
+    test_case_a = {"query": "hi"}
+    test_case_b = {"query": "bye"}
+
+    runner(test_case_a)
+    runner(test_case_a)  # same test case object -> same session reused
+    runner(test_case_b)  # different test case object -> a fresh session
+
+    assert len(factory_calls) == 2  # one per distinct test case, not per call
+    assert captured_sessions[0] is captured_sessions[1]
+    assert captured_sessions[2] is not captured_sessions[0]
+
+
+def test_openai_agents_runner_session_aware_false_is_fresh_every_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Default `session_aware=False` preserves the original per-call-fresh behavior."""
+    agents = pytest.importorskip("agents")
+    from agent_regress.integrations.openai_agents import openai_agents_runner
+
+    factory_calls: list[object] = []
+
+    def _factory() -> object:
+        session = object()
+        factory_calls.append(session)
+        return session
+
+    captured_sessions: list[Any] = []
+
+    class _FakeResult:
+        final_output = "ok"
+
+    async def _fake_run(starting_agent: Any, input: Any, **kwargs: Any) -> _FakeResult:
+        captured_sessions.append(kwargs["session"])
+        return _FakeResult()
+
+    monkeypatch.setattr(agents.Runner, "run", _fake_run)
+
+    agent = agents.Agent(name="session-not-aware-agent", instructions="be helpful")
+    runner = openai_agents_runner(agent, session_factory=_factory)
+
+    test_case = {"query": "hi"}
+    runner(test_case)
+    runner(test_case)
+
+    assert len(factory_calls) == 2
+    assert captured_sessions[0] is not captured_sessions[1]
+
+
+def test_openai_agents_runner_session_aware_ignores_explicit_session(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`session=` (an already-built session) is unaffected by `session_aware=`."""
+    agents = pytest.importorskip("agents")
+    from agent_regress.integrations.openai_agents import openai_agents_runner
+
+    class _FakeSession:
+        pass
+
+    fake_session = _FakeSession()
+    captured: dict[str, Any] = {}
+
+    class _FakeResult:
+        final_output = "ok"
+
+    async def _fake_run(starting_agent: Any, input: Any, **kwargs: Any) -> _FakeResult:
+        captured.update(kwargs)
+        return _FakeResult()
+
+    monkeypatch.setattr(agents.Runner, "run", _fake_run)
+
+    agent = agents.Agent(name="explicit-session-agent", instructions="be helpful")
+    runner = openai_agents_runner(agent, session=fake_session, session_aware=True)
+    runner({"query": "hi"})
+
+    assert captured["session"] is fake_session
+
+
+def test_openai_agents_runner_capture_trace_records_nested_run_config_inheritance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`trace["nested_run_configs"]` flags a nested `Runner.run` that reused the
+    exact same top-level `RunConfig` object — the PR #2463 inheritance signal.
+    """
+    agents = pytest.importorskip("agents")
+    from agent_regress.integrations.openai_agents import openai_agents_runner
+
+    nested_agent = agents.Agent(name="nested-tool-agent", instructions="be helpful")
+    depth = {"n": 0}
+
+    class _FakeResult:
+        final_output = "top-level output"
+
+    async def _fake_run(*args: Any, **kwargs: Any) -> _FakeResult:
+        depth["n"] += 1
+        if depth["n"] == 1:
+            # Simulate the SDK's `Agent.as_tool()` nested dispatch reusing the
+            # parent's RunConfig object unchanged (no explicit override) —
+            # exactly what agents/agent.py's `_run_agent_impl` does when
+            # `as_tool(run_config=...)` was not given an override.
+            await agents.Runner.run(
+                starting_agent=nested_agent,
+                input="nested query",
+                run_config=kwargs.get("run_config"),
+            )
+        return _FakeResult()
+
+    monkeypatch.setattr(agents.Runner, "run", _fake_run)
+
+    agent = agents.Agent(name="top-level-agent", instructions="be helpful")
+    runner = openai_agents_runner(agent, capture_trace=True)
+    result = runner({"query": "trigger nested tool call"})
+
+    nested = result.trace["nested_run_configs"]
+    assert len(nested) == 1
+    assert nested[0]["agent_name"] == "nested-tool-agent"
+    assert nested[0]["same_object_as_top_level_run_config"] is True
+
+
+def test_openai_agents_runner_capture_trace_flags_nested_run_config_override(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A nested call with a DIFFERENT RunConfig object is flagged as not-inherited."""
+    agents = pytest.importorskip("agents")
+    from agent_regress.integrations.openai_agents import openai_agents_runner
+
+    nested_agent = agents.Agent(name="overridden-tool-agent", instructions="be helpful")
+    depth = {"n": 0}
+
+    class _FakeResult:
+        final_output = "top-level output"
+
+    async def _fake_run(*args: Any, **kwargs: Any) -> _FakeResult:
+        depth["n"] += 1
+        if depth["n"] == 1:
+            # Simulate `as_tool(run_config=<explicit override>)`: a brand-new
+            # RunConfig object, not the parent's.
+            await agents.Runner.run(
+                starting_agent=nested_agent,
+                input="nested query",
+                run_config=agents.RunConfig(),
+            )
+        return _FakeResult()
+
+    monkeypatch.setattr(agents.Runner, "run", _fake_run)
+
+    agent = agents.Agent(name="top-level-agent-2", instructions="be helpful")
+    runner = openai_agents_runner(agent, capture_trace=True)
+    result = runner({"query": "trigger nested tool call with override"})
+
+    nested = result.trace["nested_run_configs"]
+    assert len(nested) == 1
+    assert nested[0]["same_object_as_top_level_run_config"] is False
+
+
+def _make_multimodal_function_call_output() -> list[dict[str, Any]]:
+    return [
+        {
+            "type": "function_call_output",
+            "call_id": "call_1",
+            "output": [
+                {"type": "input_text", "text": "here is the result"},
+                {"type": "input_image", "image_url": "https://example.com/img.png"},
+            ],
+        }
+    ]
+
+
+def test_openai_agents_runner_capture_trace_records_converted_tool_outputs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`trace["converted_tool_outputs"]` shows whether non-text tool output
+    (e.g. an image) survives `Converter.items_to_messages` conversion — the
+    PR #2214 concern, downstream of `FunctionSpanData.export()`'s stringification.
+
+    With `preserve_tool_output_all_content=True` (the flag PR #2214-shaped fixes
+    plumb through), the image content part survives conversion.
+    """
+    agents = pytest.importorskip("agents")
+    from agent_regress.integrations.openai_agents import openai_agents_runner
+
+    class _FakeResult:
+        final_output = "ok"
+
+    async def _fake_run(*args: Any, **kwargs: Any) -> _FakeResult:
+        from agents.models.chatcmpl_converter import Converter  # noqa: PLC0415
+
+        Converter.items_to_messages(
+            _make_multimodal_function_call_output(),
+            model="gpt-4o",
+            preserve_tool_output_all_content=True,
+        )
+        return _FakeResult()
+
+    monkeypatch.setattr(agents.Runner, "run", _fake_run)
+
+    agent = agents.Agent(name="multimodal-tool-agent", instructions="be helpful")
+    runner = openai_agents_runner(agent, capture_trace=True)
+    result = runner({"query": "call the multimodal tool"})
+
+    converted = result.trace["converted_tool_outputs"]
+    assert len(converted) == 1
+    pre = converted[0]["pre_conversion_outputs"]
+    assert pre == [
+        {
+            "call_id": "call_1",
+            "output": [
+                {"type": "input_text", "text": "here is the result"},
+                {"type": "input_image", "image_url": "https://example.com/img.png"},
+            ],
+        }
+    ]
+    post = converted[0]["post_conversion_tool_messages"]
+    assert len(post) == 1
+    assert post[0]["tool_call_id"] == "call_1"
+    content_types = {part["type"] for part in post[0]["content"]}
+    assert content_types == {"text", "image_url"}
+
+
+def test_openai_agents_runner_capture_trace_shows_non_text_dropped_without_preserve_flag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Without `preserve_tool_output_all_content=True` (the default), the SDK's
+    converter drops non-text tool output content — exactly the gap PR #2214
+    concerns itself with. This is the "converter stripped it" side of the same
+    signal the previous test's "converter preserved it" case exercises.
+    """
+    agents = pytest.importorskip("agents")
+    from agent_regress.integrations.openai_agents import openai_agents_runner
+
+    class _FakeResult:
+        final_output = "ok"
+
+    async def _fake_run(*args: Any, **kwargs: Any) -> _FakeResult:
+        from agents.models.chatcmpl_converter import Converter  # noqa: PLC0415
+
+        Converter.items_to_messages(
+            _make_multimodal_function_call_output(),
+            model="gpt-4o",
+        )
+        return _FakeResult()
+
+    monkeypatch.setattr(agents.Runner, "run", _fake_run)
+
+    agent = agents.Agent(name="multimodal-tool-agent-2", instructions="be helpful")
+    runner = openai_agents_runner(agent, capture_trace=True)
+    result = runner({"query": "call the multimodal tool"})
+
+    post = result.trace["converted_tool_outputs"][0]["post_conversion_tool_messages"]
+    content_types = {part["type"] for part in post[0]["content"]}
+    assert content_types == {"text"}
+    assert "image_url" not in content_types
+
+
+def test_openai_agents_runner_capture_trace_converted_tool_outputs_empty_by_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """No converter activity during the run -> an empty (not missing) list."""
+    agents = pytest.importorskip("agents")
+    from agent_regress.integrations.openai_agents import openai_agents_runner
+
+    class _FakeResult:
+        final_output = "ok"
+
+    async def _fake_run(*args: Any, **kwargs: Any) -> _FakeResult:
+        return _FakeResult()
+
+    monkeypatch.setattr(agents.Runner, "run", _fake_run)
+
+    agent = agents.Agent(name="plain-tool-agent", instructions="be helpful")
+    runner = openai_agents_runner(agent, capture_trace=True)
+    result = runner({"query": "no tools called"})
+
+    assert result.trace["converted_tool_outputs"] == []
+    assert result.trace["nested_run_configs"] == []
+
+
 class _FakeRealtimeToolStartEvent:
     def __init__(self, tool_name: str) -> None:
         self.tool_name = tool_name
