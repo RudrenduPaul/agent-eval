@@ -30,6 +30,7 @@ classifiers = [
 dependencies = [
     "scipy>=1.13",
     "numpy>=1.26",
+    "jsonschema>=4.21",
 ]
 
 [project.optional-dependencies]
@@ -44,7 +45,6 @@ dev = [
     "mypy>=1.10",
     "ruff>=0.9",
     "pre-commit>=3.7",
-    "jsonschema>=4.21",
 ]
 
 [project.urls]

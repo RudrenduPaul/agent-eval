@@ -4,47 +4,289 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import contextlib
+import dataclasses
+import inspect
+from collections.abc import Callable, Coroutine
 from typing import Any
 
 from agent_regress.core.runner import AgentCallable
 
 
-def openai_agents_runner(agent: Any) -> AgentCallable:
+@dataclasses.dataclass(frozen=True)
+class TracedResult:
+    """Return value of ``openai_agents_runner(..., capture_trace=True)``.
+
+    Attributes:
+        output: The normal agent output — identical to what the runner would
+            return when ``capture_trace=False``.
+        trace: Best-effort captured telemetry for the run. Contains at least
+            ``"run_config"`` (the resolved ``agents.RunConfig`` used for the run,
+            expanded to a field-name -> value dict) and ``"tool_calls"`` (a list of
+            exported ``FunctionSpanData`` dicts for every tool-call span observed
+            via the Agents SDK tracing processor hook during the run).
+    """
+
+    output: Any
+    trace: dict[str, Any]
+
+
+def _run_coroutine_sync(coro_fn: Callable[[], Coroutine[Any, Any, Any]]) -> Any:
+    """Run ``coro_fn()`` to completion, from sync or already-async contexts alike.
+
+    Handles both synchronous and async (Jupyter / already-running-loop) contexts
+    by spawning a background thread when a running event loop is detected.
+    """
+    try:
+        asyncio.get_running_loop()
+        loop_running = True
+    except RuntimeError:
+        loop_running = False
+
+    if loop_running:
+        # A loop is already running (e.g. Jupyter) — run in a fresh thread.
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+            return ex.submit(asyncio.run, coro_fn()).result()
+    return asyncio.run(coro_fn())
+
+
+def openai_agents_runner(
+    agent: Any,
+    *,
+    capture_trace: bool = False,
+    session: Any | None = None,
+    session_factory: Callable[[], Any] | None = None,
+) -> AgentCallable:
     """Wrap an OpenAI Agents SDK agent as an agent-regress AgentCallable.
 
     Handles both synchronous and async (Jupyter / already-running-loop) contexts
     by spawning a background thread when a running event loop is detected.
 
     Args:
-        agent: An OpenAI Agents SDK agent with an async .run(query) method.
+        agent: An OpenAI Agents SDK ``Agent`` instance. Run via the real SDK
+            entrypoint, the module-level ``agents.Runner.run(agent, query, ...)``
+            (``agents.Agent`` itself has no ``.run()`` method).
+        capture_trace: When True, attach an Agents SDK tracing processor before
+            the run and return ``TracedResult(output=<normal output>, trace={...})``
+            instead of the raw output. Default False preserves the original return
+            value (the run's ``final_output``) unchanged — this is the
+            backward-compatibility contract.
+        session: An optional ``agents.Session`` implementer (e.g. a
+            ``MongoDBSession``-shaped object) to pass through to
+            ``agents.Runner.run(agent, query, session=session)`` for multi-turn /
+            persistent-memory continuity. Takes precedence over ``session_factory``
+            when both are given. Default None preserves current behavior exactly.
+        session_factory: An optional zero-arg callable invoked once per call to
+            build a fresh session object, used the same way as ``session``. Ignored
+            when ``session`` is given.
 
     Returns:
         An AgentCallable suitable for use with compare() or run_suite().
     """
     try:
-        import agents  # noqa: F401, PLC0415  # type: ignore[import-untyped]
+        import agents  # noqa: PLC0415  # type: ignore[import-untyped]
     except ImportError as exc:
         raise ImportError(
             "OpenAI Agents SDK integration requires openai-agents. "
             "Install with: pip install agent-regress[openai-agents]"
         ) from exc
 
+    def _resolve_session() -> Any:
+        if session is not None:
+            return session
+        if session_factory is not None:
+            return session_factory()
+        return None
+
+    async def _run_traced(query: str) -> TracedResult:
+        tool_calls: list[dict[str, Any]] = []
+
+        class _ToolCallCollector(agents.tracing.TracingProcessor):
+            def on_trace_start(self, trace: Any) -> None:
+                return None
+
+            def on_trace_end(self, trace: Any) -> None:
+                return None
+
+            def on_span_start(self, span: Any) -> None:
+                return None
+
+            def on_span_end(self, span: Any) -> None:
+                span_data = getattr(span, "span_data", None)
+                if span_data is None:
+                    return
+                if getattr(span_data, "type", None) == "function":
+                    with contextlib.suppress(Exception):
+                        tool_calls.append(span_data.export())
+
+            def shutdown(self) -> None:
+                return None
+
+            def force_flush(self) -> None:
+                return None
+
+        collector = _ToolCallCollector()
+        provider = agents.tracing.get_trace_provider()
+        # `_multi_processor`/`_processors` are private SDK internals with no
+        # public accessor for restoring the pre-capture processor list; both
+        # lookups are getattr-guarded and the restore below is
+        # best-effort (contextlib.suppress) so an SDK internals change
+        # degrades to "processors not restored" rather than crashing.
+        multi_processor = getattr(provider, "_multi_processor", None)
+        original_processors: tuple[Any, ...] | None = None
+        if multi_processor is not None:
+            original_processors = getattr(multi_processor, "_processors", None)
+
+        run_config = agents.RunConfig()
+        agents.add_trace_processor(collector)
+        try:
+            result = await agents.Runner.run(
+                agent, query, session=_resolve_session(), run_config=run_config
+            )
+        finally:
+            if multi_processor is not None and original_processors is not None:
+                with contextlib.suppress(Exception):
+                    multi_processor.set_processors(list(original_processors))
+
+        trace: dict[str, Any] = {
+            "run_config": {
+                field.name: getattr(run_config, field.name)
+                for field in dataclasses.fields(run_config)
+            },
+            "tool_calls": tool_calls,
+        }
+        return TracedResult(output=result.final_output, trace=trace)
+
     async def _run(query: str) -> Any:
-        return await agent.run(query)
+        if capture_trace:
+            return await _run_traced(query)
+        result = await agents.Runner.run(agent, query, session=_resolve_session())
+        return result.final_output
 
     def _agent(test_case: dict[str, Any]) -> Any:
         query = test_case.get("query", str(test_case))
-        try:
-            asyncio.get_running_loop()
-            loop_running = True
-        except RuntimeError:
-            loop_running = False
+        return _run_coroutine_sync(lambda: _run(query))
 
-        if loop_running:
-            # A loop is already running (e.g. Jupyter) — run in a fresh thread.
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
-                return ex.submit(asyncio.run, _run(query)).result()
-        else:
-            return asyncio.run(_run(query))
+    return _agent
+
+
+async def _enter_realtime_session(session: Any) -> bool:
+    """Enter ``session``'s async context manager if it has one.
+
+    Returns whether it was entered.
+    """
+    aenter = getattr(session, "__aenter__", None)
+    if aenter is None:
+        return False
+    await aenter()
+    return True
+
+
+async def _exit_realtime_session(session: Any, entered: bool) -> None:
+    """Tear down ``session`` via its async context manager, else a best-effort close().
+
+    Falls back to a sync-or-async ``close()`` method when the session was never
+    entered as an async context manager.
+    """
+    if entered:
+        aexit = getattr(session, "__aexit__", None)
+        if aexit is not None:
+            await aexit(None, None, None)
+        return
+    close = getattr(session, "close", None)
+    if close is None:
+        return
+    maybe_awaitable = close()
+    if inspect.isawaitable(maybe_awaitable):
+        await maybe_awaitable
+
+
+async def _send_scripted_inputs(session: Any, scripted_inputs: list[Any]) -> None:
+    """Feed each scripted input into ``session`` via ``send_message``/``send``.
+
+    Raises TypeError if the session exposes neither method.
+    """
+    send = getattr(session, "send_message", None) or getattr(session, "send", None)
+    if send is None:
+        raise TypeError(
+            "realtime session object must expose a send_message(...) or "
+            "send(...) coroutine method"
+        )
+    for scripted_input in scripted_inputs:
+        await send(scripted_input)
+
+
+async def _collect_realtime_tool_events(
+    session: Any, max_events: int | None
+) -> list[Any]:
+    """Consume ``session``'s async event stream, keeping only tool start/end events."""
+    collected: list[Any] = []
+    if not hasattr(session, "__aiter__"):
+        return collected
+    count = 0
+    async for event in session:
+        type_name = type(event).__name__
+        if "RealtimeToolStart" in type_name or "RealtimeToolEnd" in type_name:
+            collected.append(event)
+        count += 1
+        if max_events is not None and count >= max_events:
+            break
+    return collected
+
+
+def openai_agents_realtime_runner(
+    session_factory: Callable[[], Any],
+    scripted_inputs: list[Any],
+    *,
+    max_events: int | None = None,
+) -> AgentCallable:
+    """Wrap an OpenAI Agents SDK realtime session as an agent-regress AgentCallable.
+
+    Drives a realtime session over a fixed list of scripted inputs and collects
+    any ``RealtimeToolStart``/``RealtimeToolEnd``-shaped events it observes into a
+    scoreable dict: ``{"events": [...]}``.
+
+    The session object returned by ``session_factory()`` is duck-typed like
+    ``agents.realtime.RealtimeSession`` and, on a best-effort basis, is expected to
+    support:
+
+    - The async context manager protocol (``__aenter__``/``__aexit__``), used to
+      enter/exit the session when present.
+    - A ``send_message(...)`` (or ``send(...)``) coroutine method, used to feed
+      each entry of ``scripted_inputs`` into the session, in order.
+    - Async iteration (``__aiter__``/``__anext__``) yielding realtime events. Every
+      event whose class name contains ``"RealtimeToolStart"`` or
+      ``"RealtimeToolEnd"`` is collected, in order observed.
+    - An optional ``close()`` method (sync or async), used as a fallback teardown
+      when the session does not support the async context manager protocol.
+
+    Args:
+        session_factory: Zero-arg callable that returns a fresh realtime-session-like
+            object for each call.
+        scripted_inputs: Ordered inputs sent into the session via
+            ``send_message``/``send`` before consuming its event stream.
+        max_events: Optional cap on the number of events consumed from the
+            session's event stream before stopping — useful for bounding an
+            otherwise-unbounded live session. Default None consumes events until
+            the stream itself ends (e.g. a finite test double / scripted replay).
+
+    Returns:
+        An AgentCallable suitable for use with compare() or run_suite(); each call
+        returns ``{"events": [<collected RealtimeToolStart/RealtimeToolEnd events>]}``.
+    """
+
+    async def _drive() -> dict[str, Any]:
+        session = session_factory()
+        entered = await _enter_realtime_session(session)
+        try:
+            await _send_scripted_inputs(session, scripted_inputs)
+            events = await _collect_realtime_tool_events(session, max_events)
+            return {"events": events}
+        finally:
+            await _exit_realtime_session(session, entered)
+
+    def _agent(test_case: dict[str, Any]) -> Any:
+        del test_case  # unused: scripted_inputs drive the session, not the test case
+        return _run_coroutine_sync(_drive)
 
     return _agent

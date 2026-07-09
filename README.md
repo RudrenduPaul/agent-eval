@@ -248,6 +248,11 @@ See [docs/benchmarks.md](docs/benchmarks.md) to reproduce.
 | AutoGen | Planned (v0.3) | |
 | Vercel AI SDK (TypeScript) | Planned (v0.4) | |
 
+Comparing two *installed versions* of the same framework (rather than two
+in-process configurations)? See
+[docs/cross-version-comparison.md](docs/cross-version-comparison.md) for the
+`subprocess_runner()` pattern.
+
 ---
 
 ## Standard benchmarks
