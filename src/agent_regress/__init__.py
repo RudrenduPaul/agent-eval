@@ -19,20 +19,45 @@ from __future__ import annotations
 from agent_regress.ci.gate import RegressionGate, assert_no_regression
 from agent_regress.core.compare import compare
 from agent_regress.core.report import Report, Verdict
-from agent_regress.core.runner import AgentCallable, ScorerCallable, run_suite
-from agent_regress.core.scorer import exact_match_scorer, f1_scorer
+from agent_regress.core.runner import (
+    AgentCallable,
+    AsyncAgentCallable,
+    ScorerCallable,
+    arun_suite,
+    concurrent_cancellation_probe,
+    run_suite,
+    subprocess_runner,
+)
+from agent_regress.core.scorer import (
+    exact_match_scorer,
+    f1_scorer,
+    no_path_leak_scorer,
+    schema_conformance_scorer,
+    state_diff_scorer,
+    structured_content_scorer,
+    tool_call_trace_scorer,
+)
 
 __version__ = "0.1.0"
 __all__ = [
     "AgentCallable",
+    "AsyncAgentCallable",
     "RegressionGate",
     "Report",
     "ScorerCallable",
     "Verdict",
     "__version__",
+    "arun_suite",
     "assert_no_regression",
     "compare",
+    "concurrent_cancellation_probe",
     "exact_match_scorer",
     "f1_scorer",
+    "no_path_leak_scorer",
     "run_suite",
+    "schema_conformance_scorer",
+    "state_diff_scorer",
+    "structured_content_scorer",
+    "subprocess_runner",
+    "tool_call_trace_scorer",
 ]
