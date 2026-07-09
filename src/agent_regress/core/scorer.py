@@ -95,6 +95,25 @@ def structured_content_scorer(
     key/value pair in it must also be present and equal in the captured
     trace; the output score and trace-match fraction are then averaged
     (each weighted 0.5). Otherwise only the output score is returned.
+
+    If `test_case["expected_converted_tool_output_types"]` is present (a dict
+    of `call_id -> iterable of expected content "type" strings`, e.g.
+    `{"call_123": ["text", "image_url"]}`), it is checked against
+    `trace["converted_tool_outputs"]` — the shape produced by
+    `openai_agents_runner(..., capture_trace=True)` for
+    `Converter.items_to_messages` interception (see
+    `agent_regress.integrations.openai_agents.TracedResult`). For each
+    `call_id`, all of its expected content types must appear among the
+    post-conversion tool message's content-part types for that call; the
+    matched fraction is folded in as one more equally-weighted component
+    alongside `output_score` (and `trace_score`, if `expected_trace` is also
+    present) — i.e. with neither extra key present this is unchanged
+    (`output_score` only); with exactly one extra key present it is the same
+    0.5/0.5 average as before; with both present it's an equal three-way
+    average. Missing/malformed `converted_tool_outputs` data (e.g. because the
+    trace wasn't produced by `capture_trace=True`, or the SDK version doesn't
+    expose the converter) scores 0.0 for any `call_id` with no matching
+    observed content, rather than raising.
     """
     if hasattr(result, "output"):
         output = result.output
@@ -110,21 +129,71 @@ def structured_content_scorer(
     output_score = scorer(output, test_case)
 
     expected_trace = test_case.get("expected_trace")
-    if expected_trace is None:
+    expected_converted_types = test_case.get("expected_converted_tool_output_types")
+    if expected_trace is None and expected_converted_types is None:
         return output_score
 
     trace_dict = trace if isinstance(trace, dict) else {}
-    if not expected_trace:
-        trace_score = 1.0
-    else:
-        matches = sum(
-            1
-            for key, value in expected_trace.items()
-            if key in trace_dict and trace_dict[key] == value
-        )
-        trace_score = matches / len(expected_trace)
+    components = [output_score]
 
-    return 0.5 * output_score + 0.5 * trace_score
+    if expected_trace is not None:
+        if not expected_trace:
+            trace_score = 1.0
+        else:
+            matches = sum(
+                1
+                for key, value in expected_trace.items()
+                if key in trace_dict and trace_dict[key] == value
+            )
+            trace_score = matches / len(expected_trace)
+        components.append(trace_score)
+
+    if expected_converted_types is not None:
+        components.append(
+            _converted_tool_output_type_score(trace_dict, expected_converted_types)
+        )
+
+    return sum(components) / len(components)
+
+
+def _converted_tool_output_type_score(
+    trace_dict: dict[str, Any], expected_converted_types: dict[Any, Any]
+) -> float:
+    """Fraction of `expected_converted_types` call_ids whose expected content
+    types are all present among the observed post-conversion content-part
+    types for that call_id, per `trace_dict["converted_tool_outputs"]`.
+    """
+    if not expected_converted_types:
+        return 1.0
+
+    observed_types: dict[Any, set[str]] = {}
+    converted = trace_dict.get("converted_tool_outputs", [])
+    if isinstance(converted, list):
+        for batch in converted:
+            if not isinstance(batch, dict):
+                continue
+            for message in batch.get("post_conversion_tool_messages", []):
+                if not isinstance(message, dict):
+                    continue
+                call_id = message.get("tool_call_id")
+                if call_id is None:
+                    continue
+                content = message.get("content")
+                types: set[str] = set()
+                if isinstance(content, str):
+                    types.add("text")
+                elif isinstance(content, list):
+                    for part in content:
+                        if isinstance(part, dict) and "type" in part:
+                            types.add(str(part["type"]))
+                observed_types.setdefault(call_id, set()).update(types)
+
+    matches = sum(
+        1
+        for call_id, expected_call_types in expected_converted_types.items()
+        if set(expected_call_types).issubset(observed_types.get(call_id, set()))
+    )
+    return matches / len(expected_converted_types)
 
 
 _POSIX_PATH_RE = re.compile(r"/(?:[\w.\-]+/)+[\w.\-]+")

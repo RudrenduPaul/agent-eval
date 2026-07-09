@@ -14,6 +14,7 @@ from typing import Any
 import pytest
 
 from agent_regress.core.runner import (
+    CACHE_BUST_NONCE_KEY,
     _default_cancel_indices,
     arun_suite,
     concurrent_cancellation_probe,
@@ -34,6 +35,10 @@ def _fixed_async_agent(score: float) -> Any:
         return score
 
     return _agent
+
+
+def test_cache_bust_nonce_key_is_importable_and_stable() -> None:
+    assert CACHE_BUST_NONCE_KEY == "_cache_bust_nonce"
 
 
 class TestRunSuite:
@@ -193,6 +198,29 @@ class TestRunSuite:
             warnings.simplefilter("always")
             run_suite(_varying_agent, basic_test_suite, n_runs=10)
             assert not any("SUT-side caching" in str(warning.message) for warning in w)
+
+    def test_near_zero_variance_warns_on_near_identical_non_byte_identical_scores(
+        self, basic_test_suite: list[dict[str, Any]]
+    ) -> None:
+        """Range-based check catches near-duplicate floats the old
+        exact-set check (`len(set(all_scores)) == 1`) would have missed,
+        since these scores are all distinct Python floats (not byte-identical)
+        but differ from each other by far less than any practically
+        meaningful variance.
+        """
+        counter = itertools.count(1)
+
+        def _near_identical_agent(tc: dict[str, Any]) -> float:
+            return 0.8 + next(counter) * 1e-11
+
+        scores = []
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            scores = run_suite(_near_identical_agent, basic_test_suite, n_runs=10)
+            # Sanity: the old exact-set check would NOT have fired, because
+            # these scores are not byte-identical.
+            assert len(set(scores)) > 1
+            assert any("SUT-side caching" in str(warning.message) for warning in w)
 
     def test_stateful_param_default_preserves_behavior(
         self, basic_test_suite: list[dict[str, Any]]

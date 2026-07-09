@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import inspect
 import itertools
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Any
 
-from agent_regress.core.runner import AgentCallable, AsyncAgentCallable
+from agent_regress.core.runner import (
+    CACHE_BUST_NONCE_KEY,
+    AgentCallable,
+    AsyncAgentCallable,
+)
 
 
 def _build_state(test_case: dict[str, Any], input_key: str) -> dict[str, Any]:
@@ -17,9 +21,19 @@ def _build_state(test_case: dict[str, Any], input_key: str) -> dict[str, Any]:
     `input_key` is present in `test_case`, only that field is passed as the
     graph state; otherwise the entire test case dict is passed through
     unchanged.
+
+    When narrowing to just `input_key`, `CACHE_BUST_NONCE_KEY` (the nonce
+    `run_suite(cache_bust_key_fn=...)` injects into each test case, see
+    `agent_regress.core.runner`) is preserved alongside it if present.
+    Without this, the narrowing branch would silently drop the nonce before
+    it ever reached the graph, defeating cache-busting for every LangGraph
+    runner whose test cases carry `input_key` (reported by @nfcampos).
     """
     if input_key in test_case:
-        return {input_key: test_case[input_key]}
+        state = {input_key: test_case[input_key]}
+        if CACHE_BUST_NONCE_KEY in test_case:
+            state[CACHE_BUST_NONCE_KEY] = test_case[CACHE_BUST_NONCE_KEY]
+        return state
     return test_case
 
 
@@ -162,12 +176,13 @@ def langgraph_runner(  # noqa: PLR0913
     return _agent
 
 
-def langgraph_async_runner(
+def langgraph_async_runner(  # noqa: PLR0913
     graph: Any,
     input_key: str = "messages",
     store: Any = None,
     config: dict[str, Any] | None = None,
     context: dict[str, Any] | None = None,
+    operation: Callable[[Any, dict[str, Any]], Awaitable[Any]] | None = None,
 ) -> AsyncAgentCallable:
     """Wrap a LangGraph graph as an agent-regress AsyncAgentCallable.
 
@@ -208,6 +223,16 @@ def langgraph_async_runner(
             context=context)`` only when given (``None``, the default,
             forwards nothing extra, so older LangGraph installs whose
             `.ainvoke()` predates the `context` API are unaffected).
+        operation: Optional async callable ``(graph, test_case) -> Awaitable[Any]``.
+            When given, ``_agent(test_case)`` calls
+            ``await operation(graph, test_case)`` instead of the default
+            ``await graph.ainvoke(state, ...)`` path. This lets a caller
+            exercise non-invoke, checkpoint-surgery methods such as
+            ``graph.abulk_update_state(...)``, ``graph.aupdate_state(...)``,
+            or ``graph.aget_state(...)``, e.g. ``operation=lambda g, tc:
+            g.abulk_update_state(tc["config"], tc["updates"])``. When
+            ``operation`` is given, ``input_key``/``store``/``config``/
+            ``context`` are ignored for that call.
 
     Returns:
         An AsyncAgentCallable suitable for use with `arun_suite()` or
@@ -224,11 +249,145 @@ def langgraph_async_runner(
     merged_config = _wire_store_into_config(config, store)
 
     async def _agent(test_case: dict[str, Any]) -> Any:
+        if operation is not None:
+            return await operation(graph, test_case)
+
         state = _build_state(test_case, input_key)
         invoke_kwargs: dict[str, Any] = {"config": merged_config}
         if context is not None:
             invoke_kwargs["context"] = context
         return await graph.ainvoke(state, **invoke_kwargs)
+
+    return _agent
+
+
+def langgraph_interrupt_resume_runner(
+    graph: Any,
+    input_key: str = "messages",
+    resume_value: Any = None,
+    config: dict[str, Any] | None = None,
+) -> AgentCallable:
+    """Wrap a LangGraph graph to exercise the interrupt-then-resume cycle.
+
+    Purpose-built for the risk class behind PR #3126 ("allow ToolNode to
+    accept ToolCalls"): a node re-executing (double-running) a tool call
+    after a graph resumes from an `interrupt()`. `langgraph_runner()`'s
+    `operation=`/`thread_aware=` params already let a caller hand-roll this
+    sequence manually; this function is the built-in convenience for the
+    common case so callers don't have to re-derive the interrupt-detection
+    logic themselves.
+
+    Sequence per test case:
+        1. ``graph.invoke(state, config=call_config)`` — same state-building
+           as `langgraph_runner` (see `_build_state`). A `thread_id` is
+           auto-generated per test case (stable across the two invokes for
+           that case, distinct across test cases) and injected into
+           ``call_config["configurable"]["thread_id"]`` unless the caller's
+           ``config`` already supplies one — a checkpointer-backed graph
+           needs a stable thread id to resume the *same* paused checkpoint.
+        2. ``graph.get_state(call_config)`` is inspected to determine whether
+           the graph actually interrupted. This was verified against the
+           installed `langgraph` 1.2.6 source
+           (`langgraph/types.py::StateSnapshot`): a `StateSnapshot` exposes
+           `.next` (tuple of node names scheduled to run next — non-empty
+           when paused at an interrupt) and `.interrupts` (tuple of pending
+           `Interrupt` objects), and each entry in `.tasks`
+           (tuple of `PregelTask`) has its own `.interrupts` tuple. This
+           function treats the graph as interrupted if any of those three
+           signals is non-empty, which is robust to a LangGraph version that
+           only surfaces the pause on one of them.
+        3. If interrupted, resume via ``graph.invoke(Command(resume=
+           resume_value), config=call_config)`` (``Command`` imported from
+           ``langgraph.types``, confirmed present with a ``resume=`` keyword
+           on the installed version). The resumed call's return value
+           replaces the initial call's return value as the "final" result.
+        4. Return a dict bundling enough information for
+           `agent_regress.core.scorer.tool_call_trace_scorer` (and other
+           scorers) to detect double-execution across the interrupt/resume
+           boundary:
+           ``{"result": <final invoke() return value>, "interrupted": bool,
+           "messages": <final result["messages"] if the result is a dict
+           with that key, else None>}``. Because `tool_call_trace_scorer`
+           reads `output["messages"]` directly, pass this dict straight to
+           it as `output` — if a tool node re-executed after resume, a
+           `tool_call_id` will appear more than once in `messages` and
+           `tool_call_trace_scorer` will score below 1.0 for that id.
+
+    Args:
+        graph: A compiled LangGraph graph with `.invoke()` and `.get_state()`
+            methods, compiled with a checkpointer (required by LangGraph for
+            `graph.get_state()` to return anything other than raising
+            `ValueError: No checkpointer set`).
+        input_key: Key used to pass the test case into the graph state. Same
+            semantics as `langgraph_runner`'s `input_key`.
+        resume_value: Value forwarded as `Command(resume=resume_value)` when
+            resuming an interrupted graph. Defaults to `None`, matching
+            `Command`'s own default.
+        config: Optional base LangGraph `config` dict, merged with the
+            auto-generated `thread_id` the same way `langgraph_runner`'s
+            `thread_aware=True` merges it (an explicit
+            `config["configurable"]["thread_id"]` is preserved and not
+            overwritten). Defaults to `None`.
+
+    Returns:
+        An AgentCallable suitable for use with `compare()` or `run_suite()`.
+
+    Limitations (documented, not silently assumed):
+        - This function does not itself decide *when* a graph should
+          interrupt — that is entirely up to how the wrapped graph's nodes
+          call `interrupt()`. If a test case's input never triggers an
+          `interrupt()`, step 3 above is simply skipped and
+          `interrupted=False` is returned; this is a real (not fake)
+          no-interrupt result, not an error.
+        - Only a single interrupt/resume cycle is exercised. A graph that
+          interrupts more than once per run (nested/sequential interrupts)
+          will only have its first pause resumed here; the returned
+          `"result"` reflects whatever LangGraph does when `Command(resume=
+          resume_value)` is invoked against a still-further-interrupted
+          graph (typically it just pauses again, unresolved by this
+          function).
+    """
+    try:
+        import langgraph  # noqa: F401, PLC0415  # type: ignore[import-untyped]
+        from langgraph.types import Command  # noqa: PLC0415
+    except ImportError as exc:
+        raise ImportError(
+            "LangGraph integration requires langgraph. "
+            "Install with: pip install agent-regress[langgraph]"
+        ) from exc
+
+    thread_counter = itertools.count(1)
+
+    def _next_thread_id() -> str:
+        return f"agent-regress-interrupt-thread-{next(thread_counter)}"
+
+    def _is_interrupted(snapshot: Any) -> bool:
+        if bool(getattr(snapshot, "next", ())):
+            return True
+        if bool(getattr(snapshot, "interrupts", ())):
+            return True
+        tasks = getattr(snapshot, "tasks", ())
+        return any(bool(getattr(task, "interrupts", ())) for task in tasks)
+
+    def _agent(test_case: dict[str, Any]) -> dict[str, Any]:
+        state = _build_state(test_case, input_key)
+
+        call_config: dict[str, Any] = dict(config) if config is not None else {}
+        configurable = dict(call_config.get("configurable", {}))
+        configurable.setdefault("thread_id", _next_thread_id())
+        call_config["configurable"] = configurable
+
+        result = graph.invoke(state, config=call_config)
+
+        snapshot = graph.get_state(call_config)
+        interrupted = _is_interrupted(snapshot)
+
+        if interrupted:
+            result = graph.invoke(Command(resume=resume_value), config=call_config)
+
+        messages = result.get("messages") if isinstance(result, dict) else None
+
+        return {"result": result, "interrupted": interrupted, "messages": messages}
 
     return _agent
 

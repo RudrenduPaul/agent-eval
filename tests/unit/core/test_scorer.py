@@ -200,6 +200,107 @@ class TestStructuredContentScorer:
         result = {"output": "wrong"}
         assert structured_content_scorer(result, tc) == 0.0
 
+    def test_expected_converted_tool_output_types_all_present(self) -> None:
+        tc: dict[str, Any] = {
+            "expected": "hello",
+            "expected_converted_tool_output_types": {"call_1": ["text", "image_url"]},
+        }
+        result = {
+            "output": "hello",
+            "trace": {
+                "converted_tool_outputs": [
+                    {
+                        "pre_conversion_outputs": [{"call_id": "call_1", "output": "..."}],
+                        "post_conversion_tool_messages": [
+                            {
+                                "role": "tool",
+                                "tool_call_id": "call_1",
+                                "content": [
+                                    {"type": "text", "text": "here"},
+                                    {"type": "image_url", "image_url": {"url": "x"}},
+                                ],
+                            }
+                        ],
+                    }
+                ]
+            },
+        }
+        assert structured_content_scorer(result, tc) == 1.0
+
+    def test_expected_converted_tool_output_types_missing_lowers_score(self) -> None:
+        """The converter stripped the image (e.g. no preserve_tool_output_all_content),
+        so only "text" survived -> the expected "image_url" type is missing.
+        """
+        tc: dict[str, Any] = {
+            "expected": "hello",
+            "expected_converted_tool_output_types": {"call_1": ["text", "image_url"]},
+        }
+        result = {
+            "output": "hello",
+            "trace": {
+                "converted_tool_outputs": [
+                    {
+                        "pre_conversion_outputs": [{"call_id": "call_1", "output": "..."}],
+                        "post_conversion_tool_messages": [
+                            {
+                                "role": "tool",
+                                "tool_call_id": "call_1",
+                                "content": [{"type": "text", "text": "here"}],
+                            }
+                        ],
+                    }
+                ]
+            },
+        }
+        score = structured_content_scorer(result, tc)
+        assert score == 0.5  # output_score=1.0 averaged with conv_score=0.0
+
+    def test_expected_converted_tool_output_types_missing_trace_scores_zero_component(
+        self,
+    ) -> None:
+        tc: dict[str, Any] = {
+            "expected": "hello",
+            "expected_converted_tool_output_types": {"call_1": ["image_url"]},
+        }
+        result = {"output": "hello", "trace": None}
+        score = structured_content_scorer(result, tc)
+        assert score == 0.5
+
+    def test_expected_converted_tool_output_types_and_expected_trace_average_three_ways(
+        self,
+    ) -> None:
+        tc: dict[str, Any] = {
+            "expected": "hello",
+            "expected_trace": {"model": "gpt-5"},
+            "expected_converted_tool_output_types": {"call_1": ["text"]},
+        }
+        result = {
+            "output": "hello",
+            "trace": {
+                "model": "gpt-5",
+                "converted_tool_outputs": [
+                    {
+                        "pre_conversion_outputs": [{"call_id": "call_1", "output": "..."}],
+                        "post_conversion_tool_messages": [
+                            {
+                                "role": "tool",
+                                "tool_call_id": "call_1",
+                                "content": [{"type": "text", "text": "here"}],
+                            }
+                        ],
+                    }
+                ],
+            },
+        }
+        # output_score=1.0, trace_score=1.0, conv_score=1.0 -> average is still 1.0
+        assert structured_content_scorer(result, tc) == 1.0
+
+    def test_no_expected_converted_tool_output_types_unaffected(self) -> None:
+        """Backward compatibility: omitting the new key changes nothing."""
+        tc: dict[str, Any] = {"expected": "hello", "expected_trace": {"model": "gpt-5"}}
+        result = {"output": "hello", "trace": {"model": "gpt-5"}}
+        assert structured_content_scorer(result, tc) == 1.0
+
 
 class TestNoPathLeakScorer:
     def test_no_path_returns_one(self) -> None:
