@@ -139,7 +139,9 @@ def test_openai_agents_runner_capture_trace_false_is_unchanged(
 
 
 @pytest.mark.integration
-def test_openai_agents_runner_session_passthrough(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_openai_agents_runner_session_passthrough(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     agents = pytest.importorskip("agents")
     from agent_regress.integrations.openai_agents import openai_agents_runner
 
@@ -413,7 +415,7 @@ def test_openai_agents_runner_capture_trace_records_converted_tool_outputs(
         final_output = "ok"
 
     async def _fake_run(*args: Any, **kwargs: Any) -> _FakeResult:
-        from agents.models.chatcmpl_converter import Converter  # noqa: PLC0415
+        from agents.models.chatcmpl_converter import Converter
 
         Converter.items_to_messages(
             _make_multimodal_function_call_output(),
@@ -462,7 +464,7 @@ def test_openai_agents_runner_capture_trace_shows_non_text_dropped_without_prese
         final_output = "ok"
 
     async def _fake_run(*args: Any, **kwargs: Any) -> _FakeResult:
-        from agents.models.chatcmpl_converter import Converter  # noqa: PLC0415
+        from agents.models.chatcmpl_converter import Converter
 
         Converter.items_to_messages(
             _make_multimodal_function_call_output(),
