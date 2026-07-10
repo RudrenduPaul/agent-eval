@@ -58,7 +58,9 @@ class _FakeGraph:
     def __init__(self) -> None:
         self.calls: list[dict[str, Any]] = []
 
-    def invoke(self, state: dict[str, Any], config: dict[str, Any] | None = None) -> Any:
+    def invoke(
+        self, state: dict[str, Any], config: dict[str, Any] | None = None
+    ) -> Any:
         self.calls.append({"state": state, "config": config})
         return {"result": "ok", "call_index": len(self.calls) - 1}
 
@@ -87,7 +89,9 @@ class _FakeCheckpointGraph:
         self.update_state_calls: list[tuple[Any, Any]] = []
         self.get_state_calls: list[Any] = []
 
-    def invoke(self, state: dict[str, Any], config: dict[str, Any] | None = None) -> Any:
+    def invoke(
+        self, state: dict[str, Any], config: dict[str, Any] | None = None
+    ) -> Any:
         raise AssertionError("invoke() should not be called when operation= is set")
 
     def bulk_update_state(self, config: Any, updates: Any) -> str:
@@ -365,7 +369,10 @@ class TestThreadAware:
 class TestOperationHook:
     def test_operation_called_instead_of_invoke(self) -> None:
         graph = _FakeCheckpointGraph()
-        test_case = {"config": {"configurable": {"thread_id": "t1"}}, "updates": [({}, {})]}
+        test_case = {
+            "config": {"configurable": {"thread_id": "t1"}},
+            "updates": [({}, {})],
+        }
         agent = langgraph_runner(
             graph,
             operation=lambda g, tc: g.bulk_update_state(tc["config"], tc["updates"]),
@@ -377,7 +384,9 @@ class TestOperationHook:
     def test_operation_receives_raw_graph_and_test_case(self) -> None:
         graph = _FakeCheckpointGraph()
         test_case = {"config": "cfg-1"}
-        agent = langgraph_runner(graph, operation=lambda g, tc: g.get_state(tc["config"]))
+        agent = langgraph_runner(
+            graph, operation=lambda g, tc: g.get_state(tc["config"])
+        )
         result = agent(test_case)
         assert result == "state-snapshot"
         assert graph.get_state_calls == ["cfg-1"]
@@ -509,7 +518,10 @@ class TestLanggraphAsyncRunner:
 class TestAsyncOperationHook:
     def test_operation_called_instead_of_ainvoke(self) -> None:
         graph = _FakeAsyncCheckpointGraph()
-        test_case = {"config": {"configurable": {"thread_id": "t1"}}, "updates": [({}, {})]}
+        test_case = {
+            "config": {"configurable": {"thread_id": "t1"}},
+            "updates": [({}, {})],
+        }
         agent = langgraph_async_runner(
             graph,
             operation=lambda g, tc: g.abulk_update_state(tc["config"], tc["updates"]),
@@ -619,9 +631,7 @@ class TestInterruptResumeRunner:
         from agent_regress.core.scorer import tool_call_trace_scorer
 
         class _DoubleExecutionGraph(_FakeInterruptResumeGraph):
-            def invoke(
-                self, state: Any, config: dict[str, Any] | None = None
-            ) -> Any:
+            def invoke(self, state: Any, config: dict[str, Any] | None = None) -> Any:
                 call_index = len(self.invoke_calls)
                 self.invoke_calls.append({"state": state, "config": config})
                 if call_index == 0:
@@ -660,7 +670,9 @@ class TestImportGuard:
     ) -> None:
         monkeypatch.setitem(sys.modules, "langgraph", None)
         graph = _FakeGraph()
-        with pytest.raises(ImportError, match="pip install agent-regress\\[langgraph\\]"):
+        with pytest.raises(
+            ImportError, match="pip install agent-regress\\[langgraph\\]"
+        ):
             langgraph_runner(graph)
 
     def test_missing_langgraph_raises_import_error_for_async_runner(
@@ -668,7 +680,9 @@ class TestImportGuard:
     ) -> None:
         monkeypatch.setitem(sys.modules, "langgraph", None)
         graph = _FakeAsyncGraph()
-        with pytest.raises(ImportError, match="pip install agent-regress\\[langgraph\\]"):
+        with pytest.raises(
+            ImportError, match="pip install agent-regress\\[langgraph\\]"
+        ):
             langgraph_async_runner(graph)
 
     def test_missing_langgraph_raises_import_error_for_interrupt_resume_runner(
@@ -676,7 +690,9 @@ class TestImportGuard:
     ) -> None:
         monkeypatch.setitem(sys.modules, "langgraph", None)
         graph = _FakeInterruptResumeGraph(interrupted_after_first_invoke=False)
-        with pytest.raises(ImportError, match="pip install agent-regress\\[langgraph\\]"):
+        with pytest.raises(
+            ImportError, match="pip install agent-regress\\[langgraph\\]"
+        ):
             langgraph_interrupt_resume_runner(graph)
 
 

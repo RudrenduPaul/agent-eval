@@ -55,8 +55,7 @@ def mann_whitney_u(
     result = stats.mannwhitneyu(arr_a, arr_b, alternative=alternative, method="auto")
     if np.isnan(float(result.statistic)):
         raise ValueError(
-            "Mann-Whitney U statistic is NaN. "
-            "Input data may contain NaN values."
+            "Mann-Whitney U statistic is NaN. Input data may contain NaN values."
         )
     p_value = float(result.pvalue)
     if np.isnan(p_value):

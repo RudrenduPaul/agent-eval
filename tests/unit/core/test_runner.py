@@ -300,9 +300,7 @@ class TestArunSuite:
 
     def test_zero_runs_raises(self, basic_test_suite: list[dict[str, Any]]) -> None:
         with pytest.raises(ValueError, match="n_runs must be >= 1"):
-            asyncio.run(
-                arun_suite(_fixed_async_agent(0.8), basic_test_suite, n_runs=0)
-            )
+            asyncio.run(arun_suite(_fixed_async_agent(0.8), basic_test_suite, n_runs=0))
 
     def test_non_callable_raises(self, basic_test_suite: list[dict[str, Any]]) -> None:
         with pytest.raises(TypeError, match="agent must be callable"):
@@ -326,9 +324,7 @@ class TestArunSuite:
     def test_warns_on_low_n_runs(self, basic_test_suite: list[dict[str, Any]]) -> None:
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            asyncio.run(
-                arun_suite(_fixed_async_agent(0.8), basic_test_suite, n_runs=3)
-            )
+            asyncio.run(arun_suite(_fixed_async_agent(0.8), basic_test_suite, n_runs=3))
             assert any(issubclass(warning.category, UserWarning) for warning in w)
 
     def test_custom_scorer(self, basic_test_suite: list[dict[str, Any]]) -> None:
@@ -355,9 +351,7 @@ class TestArunSuite:
     def test_score_clamping_warns(self, basic_test_suite: list[dict[str, Any]]) -> None:
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            asyncio.run(
-                arun_suite(_fixed_async_agent(1.5), basic_test_suite, n_runs=2)
-            )
+            asyncio.run(arun_suite(_fixed_async_agent(1.5), basic_test_suite, n_runs=2))
             assert any("Clamping" in str(warning.message) for warning in w)
 
     def test_near_zero_variance_warns(
@@ -368,7 +362,9 @@ class TestArunSuite:
             asyncio.run(
                 arun_suite(_fixed_async_agent(0.5), basic_test_suite, n_runs=10)
             )
-            assert any("identical across every" in str(warning.message) for warning in w)
+            assert any(
+                "identical across every" in str(warning.message) for warning in w
+            )
 
     def test_default_allows_intra_case_concurrency(self) -> None:
         """Without stateful=True, one test case's own n_runs calls may overlap.
@@ -430,9 +426,7 @@ class TestArunSuite:
             active_count["n"] -= 1
             return 0.5
 
-        asyncio.run(
-            arun_suite(_agent, basic_test_suite, n_runs=5, max_concurrency=2)
-        )
+        asyncio.run(arun_suite(_agent, basic_test_suite, n_runs=5, max_concurrency=2))
 
         assert max_active["n"] <= 2
 
@@ -605,9 +599,7 @@ class TestSubprocessRunner:
     ) -> None:
         script = tmp_path / "failing_runner.py"
         script.write_text(
-            "import sys\n"
-            'sys.stderr.write("boom: something went wrong")\n'
-            "sys.exit(1)\n"
+            'import sys\nsys.stderr.write("boom: something went wrong")\nsys.exit(1)\n'
         )
 
         agent = subprocess_runner(sys.executable, str(script))

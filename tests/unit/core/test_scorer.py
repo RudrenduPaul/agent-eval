@@ -117,16 +117,12 @@ class TestStateDiffScorer:
         assert state_diff_scorer({"a": 2}, tc) == 0.0
 
     def test_nested_dict_recursion(self) -> None:
-        tc: dict[str, Any] = {
-            "expected_state": {"a": 1, "nested": {"x": 1, "y": 2}}
-        }
+        tc: dict[str, Any] = {"expected_state": {"a": 1, "nested": {"x": 1, "y": 2}}}
         output = {"a": 1, "nested": {"x": 1, "y": 2}}
         assert state_diff_scorer(output, tc) == 1.0
 
     def test_nested_dict_partial_mismatch_fails_that_key(self) -> None:
-        tc: dict[str, Any] = {
-            "expected_state": {"a": 1, "nested": {"x": 1, "y": 2}}
-        }
+        tc: dict[str, Any] = {"expected_state": {"a": 1, "nested": {"x": 1, "y": 2}}}
         output = {"a": 1, "nested": {"x": 1, "y": 999}}
         assert state_diff_scorer(output, tc) == 0.5
 
@@ -210,7 +206,9 @@ class TestStructuredContentScorer:
             "trace": {
                 "converted_tool_outputs": [
                     {
-                        "pre_conversion_outputs": [{"call_id": "call_1", "output": "..."}],
+                        "pre_conversion_outputs": [
+                            {"call_id": "call_1", "output": "..."}
+                        ],
                         "post_conversion_tool_messages": [
                             {
                                 "role": "tool",
@@ -240,7 +238,9 @@ class TestStructuredContentScorer:
             "trace": {
                 "converted_tool_outputs": [
                     {
-                        "pre_conversion_outputs": [{"call_id": "call_1", "output": "..."}],
+                        "pre_conversion_outputs": [
+                            {"call_id": "call_1", "output": "..."}
+                        ],
                         "post_conversion_tool_messages": [
                             {
                                 "role": "tool",
@@ -280,7 +280,9 @@ class TestStructuredContentScorer:
                 "model": "gpt-5",
                 "converted_tool_outputs": [
                     {
-                        "pre_conversion_outputs": [{"call_id": "call_1", "output": "..."}],
+                        "pre_conversion_outputs": [
+                            {"call_id": "call_1", "output": "..."}
+                        ],
                         "post_conversion_tool_messages": [
                             {
                                 "role": "tool",
