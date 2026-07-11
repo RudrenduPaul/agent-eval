@@ -204,7 +204,7 @@ def openai_agents_runner(  # noqa: PLR0915
         nested_run_configs: list[dict[str, Any]] = []
         converted_tool_outputs: list[dict[str, Any]] = []
 
-        class _ToolCallCollector(agents.tracing.TracingProcessor):
+        class _ToolCallCollector(agents.tracing.TracingProcessor):  # type: ignore[misc]
             def on_trace_start(self, trace: Any) -> None:
                 return None
 
@@ -308,7 +308,7 @@ def openai_agents_runner(  # noqa: PLR0915
             return messages
 
         agents.add_trace_processor(collector)
-        agents.Runner.run = _patched_runner_run  # type: ignore[method-assign]
+        agents.Runner.run = _patched_runner_run
         if converter_cls is not None:
             converter_cls.items_to_messages = _patched_items_to_messages
         try:
@@ -316,7 +316,7 @@ def openai_agents_runner(  # noqa: PLR0915
                 agent, query, session=_resolve_session(test_case), run_config=run_config
             )
         finally:
-            agents.Runner.run = original_runner_run  # type: ignore[method-assign]
+            agents.Runner.run = original_runner_run
             if converter_cls is not None:
                 converter_cls.items_to_messages = original_items_to_messages
             if multi_processor is not None and original_processors is not None:
