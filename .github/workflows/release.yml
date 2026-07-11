@@ -31,7 +31,7 @@ jobs:
         with:
           inputs: dist/*.whl dist/*.tar.gz
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@c062e08bd532815e2082a7e09ce9571a589bdbd2  # v2.2.1
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b  # v3.0.1
         with:
           files: |
             sbom.json
