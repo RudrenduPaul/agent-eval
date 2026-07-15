@@ -20,6 +20,7 @@ Delta:      -0.1400
 ```
 
 [![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
+[![npm](https://img.shields.io/npm/v/agent-regress-npm-cli)](https://www.npmjs.com/package/agent-regress-npm-cli)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
 
@@ -33,6 +34,12 @@ Delta:      -0.1400
 pip install agent-regress-cli
 # or
 uv add agent-regress-cli
+```
+
+Prefer Node/npx? A thin CLI wrapper is also published as [`agent-regress-npm-cli`](https://www.npmjs.com/package/agent-regress-npm-cli) on npm (it shells out to this same Python package, so Python still needs to be installed):
+
+```bash
+npx agent-regress-npm-cli --help
 ```
 
 ---
