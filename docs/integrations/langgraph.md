@@ -49,6 +49,14 @@ if it's actually accepted, so older installs never see a `TypeError`. On
 older versions, put the equivalent values under `config["configurable"]`
 instead.
 
+The `config` -> `context` migration itself (LangGraph PR #5243) is a risk
+class worth regression-testing directly: platform-supplied values like
+`thread_id`/`run_id` live in `config`, not in a user's `context_schema`, so a
+node ported to `runtime.context` ahead of the rest of the call chain reads
+`None` instead of raising -- a silent behavioral regression, not a crash. See
+`examples/05-langgraph-context-api-migration/` for a `compare()` harness
+that catches exactly this.
+
 ## Thread-aware / checkpoint continuity
 
 Set `thread_aware=True` to give each logical test case its own stable
