@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "agent-regress"
+name = "agent-regress-cli"
 version = "0.1.0"
 description = "Statistical regression testing for LLM agents. Compare two agent versions, get p-values on behavior change."
 readme = "README.md"

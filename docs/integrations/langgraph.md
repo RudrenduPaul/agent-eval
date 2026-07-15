@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-pip install agent-regress[langgraph]
+pip install agent-regress-cli[langgraph]
 ```
 
 ## Usage

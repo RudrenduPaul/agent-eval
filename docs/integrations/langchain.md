@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-pip install agent-regress[langchain]
+pip install agent-regress-cli[langchain]
 ```
 
 ## Usage

@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-pip install agent-regress[openai-agents]
+pip install agent-regress-cli[openai-agents]
 ```
 
 ## Usage

@@ -7,7 +7,7 @@ From zero to a working regression gate in under 10 minutes.
 ## Step 1: Install
 
 ```bash
-pip install agent-regress
+pip install agent-regress-cli
 ```
 
 Verify:
@@ -52,7 +52,7 @@ Output:
 
 ```
 ============================================================
-agent-regress Report -- tool_accuracy
+agent-regress-cli Report -- tool_accuracy
 ============================================================
 Verdict:    REGRESSED
 p-value:    0.0000
@@ -112,7 +112,7 @@ report = compare(
 LangGraph:
 
 ```bash
-pip install agent-regress[langgraph]
+pip install agent-regress-cli[langgraph]
 ```
 
 ```python
@@ -130,7 +130,7 @@ report = compare(
 OpenAI Agents SDK:
 
 ```bash
-pip install agent-regress[openai-agents]
+pip install agent-regress-cli[openai-agents]
 ```
 
 ```python

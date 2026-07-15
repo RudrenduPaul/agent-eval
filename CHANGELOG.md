@@ -9,6 +9,7 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- PyPI distribution renamed to `agent-regress-cli` (import path is unchanged: `import agent_regress`) -- `agent-regress` on PyPI was blocked as too similar to an existing unrelated project
 - `agent-regress` CLI (`src/agent_regress/cli.py`), wired up via `[project.scripts]`
 - `agent-regress compare --version-a-results <path.json> --version-b-results <path.json>` -- file-based entry point that runs two JSON arrays of pre-computed per-run scores through the same Mann-Whitney U / bootstrap CI / Cohen's d pipeline `compare()` uses
 - `--json` flag on `compare` for clean, machine-readable `Report` output (warnings routed to stderr)

@@ -19,7 +19,7 @@ Delta:      -0.1400
 ============================================================
 ```
 
-[![PyPI](https://img.shields.io/pypi/v/agent-regress)](https://pypi.org/project/agent-regress/)
+[![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
 
@@ -30,9 +30,9 @@ Delta:      -0.1400
 ## Install
 
 ```bash
-pip install agent-regress
+pip install agent-regress-cli
 # or
-uv add agent-regress
+uv add agent-regress-cli
 ```
 
 ---
@@ -241,10 +241,10 @@ See [docs/benchmarks.md](docs/benchmarks.md) to reproduce.
 
 | Framework | Status | Install |
 |---|---|---|
-| LangGraph | Shipped (v0.1) | `pip install agent-regress[langgraph]` |
-| OpenAI Agents SDK | Shipped (v0.1) | `pip install agent-regress[openai-agents]` |
-| CrewAI | Shipped (v0.1) | `pip install agent-regress[crewai]` |
-| LangChain LCEL | Shipped (v0.1) | `pip install agent-regress[langchain]` |
+| LangGraph | Shipped (v0.1) | `pip install agent-regress-cli[langgraph]` |
+| OpenAI Agents SDK | Shipped (v0.1) | `pip install agent-regress-cli[openai-agents]` |
+| CrewAI | Shipped (v0.1) | `pip install agent-regress-cli[crewai]` |
+| LangChain LCEL | Shipped (v0.1) | `pip install agent-regress-cli[langchain]` |
 | AutoGen | Planned (v0.3) | |
 | Vercel AI SDK (TypeScript) | Planned (v0.4) | |
 

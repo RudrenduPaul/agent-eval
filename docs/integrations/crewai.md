@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-pip install agent-regress[crewai]
+pip install agent-regress-cli[crewai]
 ```
 
 ## Usage
