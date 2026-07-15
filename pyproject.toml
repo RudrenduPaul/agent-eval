@@ -52,6 +52,9 @@ Homepage = "https://github.com/RudrenduPaul/agent-eval"
 Repository = "https://github.com/RudrenduPaul/agent-eval"
 Issues = "https://github.com/RudrenduPaul/agent-eval/issues"
 
+[project.scripts]
+agent-regress = "agent_regress.cli:main"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/agent_regress"]
 
