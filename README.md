@@ -361,8 +361,6 @@ If you use Agent Evaluation in research, please cite:
 }
 ```
 
-Methodology: [docs/[redacted]](docs/[redacted]).
-
 ---
 
 *Built by Rudrendu Paul and Sourav Nandy*
