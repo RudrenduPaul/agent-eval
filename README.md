@@ -2,22 +2,7 @@
 
 **Statistical regression testing for LLM agents.** Run your agent 50 times on a fixed test suite at version A, 50 times at version B, and get a p-value on whether behavior actually changed, not just whether the score looks different.
 
-```
-$ uv run python examples/01-basic-comparison/example.py
-
-============================================================
-agent-regress Report -- tool_accuracy
-============================================================
-Verdict:    REGRESSED
-p-value:    0.0031
-Cohen's d:  -0.610
-95% CI:     [-0.221, -0.067]
-
-Version A:  0.8400 +/- 0.0601  (n=50)
-Version B:  0.7000 +/- 0.0903  (n=50)
-Delta:      -0.1400
-============================================================
-```
+![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](docs/assets/demo-1-comparison.gif)
 
 [![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
 [![npm](https://img.shields.io/npm/v/agent-regress-npm-cli)](https://www.npmjs.com/package/agent-regress-npm-cli)
