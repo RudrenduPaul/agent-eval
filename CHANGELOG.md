@@ -5,7 +5,7 @@ All notable changes documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.2] - 2026-07-16
 
 ### Added
 
@@ -31,6 +31,7 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `openai_agents_runner`: narrow `RuntimeError` catch to avoid masking real errors and double-invoking the agent
 - `benchmarks/__init__`: export `GAIALevelResult`, `SWEBenchResult`, `TauBenchResult`
 - `core/__init__` / top-level `__init__`: export `AgentCallable` and `ScorerCallable` type aliases
+- PyPI `Author` field linked to Rudrendu's personal email under Sourav's displayed name; authors are now name-only with GitHub profile links in `project.urls`
 
 ## [0.1.0] - 2026-06-19
 

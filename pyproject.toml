@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-regress-cli"
-version = "0.1.0"
+version = "0.1.2"
 description = "Statistical regression testing for LLM agents. Compare two agent versions, get p-values on behavior change."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -51,6 +51,8 @@ dev = [
 Homepage = "https://github.com/RudrenduPaul/agent-eval"
 Repository = "https://github.com/RudrenduPaul/agent-eval"
 Issues = "https://github.com/RudrenduPaul/agent-eval/issues"
+"Author - Rudrendu Paul" = "https://github.com/RudrenduPaul"
+"Author - Sourav Nandy" = "https://github.com/Sourav-nandy-ai"
 
 [project.scripts]
 agent-regress = "agent_regress.cli:main"
