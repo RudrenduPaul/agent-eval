@@ -10,8 +10,8 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "agent-regress"
-version = "0.1.0"
+name = "agent-regress-cli"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
