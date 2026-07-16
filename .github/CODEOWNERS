@@ -1,0 +1,3 @@
+# CI/CD workflows are the highest-leverage place for a supply-chain compromise
+# to hide, so they always require review from a repo owner before merging.
+/.github/workflows/ @RudrenduPaul

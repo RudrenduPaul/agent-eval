@@ -20,7 +20,7 @@ Anti-sycophancy check: Added proactively.
 
 Pattern: CI gate should WARN, not fail, when sample size is too small.
 Rule: assert_no_regression() returns without raising when n_a < 30 or n_b < 30. Always warn.
-Anti-sycophancy check: Flagged in [redacted] invariants section.
+Anti-sycophancy check: Flagged proactively as a CI gate design invariant.
 
 ## 2026-06-19 -- Mann-Whitney NaN for all-identical distributions
 
