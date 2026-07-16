@@ -43,6 +43,12 @@ uv run pytest tests/unit/ --cov=src/ --cov-fail-under=80
 
 - PRs that break existing tests without a documented reason
 - AI-generated code submitted without running and validating the output
+- `CLAUDE.md`, `TODOS.md`, `BRANCH_PROTECTION.md`, or any `docs/security-review-*`,
+  `docs/launch/*`, or `*preprint*` file -- these are internal build artifacts and
+  must never land in this repo, even from a stale local branch
+- Code comments or docs prose that cite an internal review/approval process by
+  name (e.g. "per eng-review", "per the CEO review") instead of stating the
+  engineering rationale directly
 
 ## Maintainer SLAs
 
