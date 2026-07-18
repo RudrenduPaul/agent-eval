@@ -5,6 +5,7 @@ Reads leaderboard/results/*.json and serves an HTML table at :8080.
 
 from __future__ import annotations
 
+import html
 import http.server
 import json
 import pathlib
@@ -42,11 +43,20 @@ def _render_row(r: dict) -> str:
     gaia_l3 = _fmt(gaia.get("level_3_accuracy"))
     swe_rate = _fmt(swe.get("scaffold_pass_rate"))
 
+    # model_name/framework/submitted_date come from leaderboard/results/*.json, which is
+    # populated by external contributor PRs -- the JSON schema only constrains them to
+    # type: string, so a submitted value could contain literal HTML/script content.
+    # Escaping here (not at submission time) is what actually protects every consumer of
+    # this render path, including any future one that doesn't go through PR review.
+    model_name = html.escape(str(r.get("model_name", "—")))
+    framework = html.escape(str(r.get("framework", "—")))
+    submitted_date = html.escape(str(r.get("submitted_date", "—")))
+
     return f"""
         <tr>
-            <td>{r.get("model_name", "—")}</td>
-            <td>{r.get("framework", "—")}</td>
-            <td>{r.get("submitted_date", "—")}</td>
+            <td>{model_name}</td>
+            <td>{framework}</td>
+            <td>{submitted_date}</td>
             <td>{tau_k1}</td>
             <td>{tau_k4}</td>
             <td>{tau_k8}</td>

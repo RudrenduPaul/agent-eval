@@ -38,7 +38,7 @@ from agent_regress.core.scorer import (
     tool_call_trace_scorer,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __all__ = [
     "AgentCallable",
     "AsyncAgentCallable",

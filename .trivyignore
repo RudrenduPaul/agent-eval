@@ -1,0 +1,18 @@
+# CVE-2026-45829 (GHSA-f4j7-r4q5-qw2c): chromadb pre-auth code injection
+# Status: no upstream fix available as of 2026-07-18 (Trivy's own ignore-unfixed:true
+#         should already skip this, but listed explicitly for documentation).
+# Scope: transitive dependency of the optional `crewai` extra ONLY -- chromadb is
+#        NOT a runtime dependency of the core package and is never imported by it.
+# Action: users who install `agent-eval[crewai]` should audit their deployment
+#         surface and avoid exposing ChromaDB to untrusted input until an upstream
+#         patch is released.
+CVE-2026-45829
+
+# GHSA-xf7x-x43h-rpqh: json-repair unbounded CPU DoS via circular JSON Schema $ref
+# Status: fix exists upstream (json-repair>=0.60.1), but crewai==1.15.4 (the latest
+#         release as of 2026-07-18) pins json-repair to an exact vulnerable version
+#         (0.25.3) that cannot be overridden without breaking crewai's own resolution.
+# Scope: transitive dependency of the optional `crewai` extra ONLY -- json-repair is
+#        NOT a runtime dependency of the core package.
+# Action: re-check this ignore when crewai bumps its own json-repair pin upstream.
+GHSA-xf7x-x43h-rpqh
