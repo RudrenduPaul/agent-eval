@@ -319,6 +319,38 @@ See [leaderboard/README.md](leaderboard/README.md).
 
 ---
 
+## FAQ
+
+**What is agent-eval, and what makes it different from a normal LLM eval framework?**
+
+Agent Evaluation is a statistics library for detecting whether an agent's behavior actually changed between two versions. Run the same test suite 50 times on version A and 50 times on version B, and it reports a p-value (Mann-Whitney U), an effect size (Cohen's d), and a bootstrap 95% confidence interval on the score delta. Most eval frameworks check whether a single response clears a fixed quality threshold. Agent Evaluation instead answers a distributional question: did the score distribution shift significantly, or is a change just LLM-run-to-run noise.
+
+**How do I install it, and which platforms does it support?**
+
+`pip install agent-regress-cli` or `uv add agent-regress-cli`. It requires Python 3.10 through 3.13 (per the classifiers in `pyproject.toml`) and has no OS-specific code, so it runs anywhere those Python versions run. Node users can call `npx agent-regress-npm-cli --help`, a thin wrapper that shells out to this same Python package, so Python still needs to be installed alongside Node.
+
+**How does it compare to DeepEval, Promptfoo, or Braintrust?**
+
+The full breakdown is in the [comparison table](#how-it-differs-from-the-alternatives) above. In short: DeepEval, Promptfoo, and Braintrust all test whether an individual response clears a fixed quality bar. None of the three report a p-value, an effect size, or a bootstrap confidence interval on whether behavior shifted between two versions, which is the specific statistical question agent-eval is built to answer.
+
+**I ran a comparison and got a warning about insufficient statistical power, or a verdict of INSUFFICIENT_DATA. What does that mean?**
+
+The library warns (but does not fail) when either version has fewer than 50 runs, since that is the sample size needed for reliable detection of a moderate effect (Cohen's d of 0.2) at 80% power. Below 10 runs per version, it returns `INSUFFICIENT_DATA` instead of a REGRESSED/STABLE/IMPROVED verdict, since the sample is too small to trust any statistical conclusion. Re-run with `n_runs=50` or higher for a verdict you can act on.
+
+**Does agent-eval call my LLM or manage API keys for me?**
+
+No. `compare()` takes two callables you provide, `version_a` and `version_b`, and runs your existing agent code against your test suite. Agent Evaluation never makes a model call itself, and the stats module (`src/agent_regress/stats/`) is required to stay pure Python and scipy with no LLM calls, so the statistical core has no network dependency and nothing to configure credentials for.
+
+**Which agent frameworks does it integrate with today?**
+
+LangGraph, the OpenAI Agents SDK, CrewAI, and LangChain LCEL are shipped as of v0.1 (see the [integration matrix](#integration-matrix) above), each installable as an extra, e.g. `pip install agent-regress-cli[langgraph]`. AutoGen and a Vercel AI SDK (TypeScript) integration are planned but not yet shipped.
+
+**Can I use agent-eval commercially, and what license is it under?**
+
+Yes. It is licensed under Apache License 2.0, which permits commercial use, modification, and distribution, and includes an explicit patent grant. You need to preserve the copyright and license notices and state any changes you make; there is no warranty. See [LICENSE](LICENSE) for the full text.
+
+---
+
 ## Contributing
 
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR
