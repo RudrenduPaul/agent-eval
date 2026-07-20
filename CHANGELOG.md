@@ -19,7 +19,11 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `.github/workflows/benchmark.yml` pinned `benchmark-action/github-action-benchmark` to a SHA that does not exist upstream, failing every push; repinned to the real `v1.20.4` commit
 - README: clarified that `compare()`'s low-power warning (`n < 50`) and `RegressionGate`'s CI-gate warning (`n < 30`) are two intentionally different, independent thresholds, not a documentation inconsistency
 - README: PyPI 0.1.4's published long description was built before that session's README edits landed and was missing the CLI quickstart section; 0.1.5 republishes with the current README
-- Bumped transitive `json-repair` dependency past a high-severity advisory (GHSA-xf7x-x43h-rpqh); added a README caveat for the `[crewai]` extra's unpatched critical `chromadb` CVE (GHSA-f4j7-r4q5-qw2c, no upstream fix yet)
+- Added a README caveat for the `[crewai]` extra's unpatched critical `chromadb` CVE (GHSA-f4j7-r4q5-qw2c, no upstream fix yet)
+
+### Correction
+
+- This entry originally claimed the transitive `json-repair` dependency (GHSA-xf7x-x43h-rpqh) was bumped past its high-severity advisory. That did not actually happen: `crewai` pins `json-repair~=0.25.2` (confirmed against crewai 1.15.4 and the current latest, 1.15.5), which caps resolution below the 0.60.1 fix — `uv.lock` is still on `json-repair==0.25.3` and the Dependabot alert remains open. As established during the original triage, the vulnerable function doesn't exist in 0.25.3, so this is believed non-exploitable as installed, but it is not fixed, and won't be until `crewai` itself relaxes that pin.
 
 ## [0.1.4] - 2026-07-20
 
