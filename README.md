@@ -60,7 +60,7 @@ npx agent-regress-npm-cli --help
 | GAIA Level 1-3 split harness | **Yes** | No | No | No |
 | SWE-bench scaffold score harness | **Yes** | No | No | No |
 | Self-hostable, zero SaaS required | **Yes** | Partial | No | Yes |
-| Sample size warnings (n < 30) | **Yes** | No | No | No |
+| Sample size warnings | **Yes** | No | No | No |
 | Core license | Apache 2.0 | MIT | Proprietary | MIT† |
 | Requires cloud account | No | Optional | Yes | No |
 | Test type | Distributional | Threshold | Threshold | Threshold |
@@ -263,7 +263,7 @@ def test_routing_accuracy():
     gate.check(report)
 ```
 
-Both patterns: warn (not fail) when `n < 30` per version; treat `n < 10` as insufficient data and skip the gate.
+Both patterns: warn (not fail) when `n < 30` per version, and treat `n < 10` as insufficient data and skip the gate. This CI-gate threshold (30) is intentionally lower than `compare()`'s own general low-power warning (`n < 50`, see [FAQ](#faq)) — it exists to stop a genuinely too-small sample from silently gating a build, not to guarantee 80% statistical power the way the 50-run recommendation does.
 
 ```bash
 uv run pytest test_regression.py
@@ -316,6 +316,8 @@ Comparing two *installed versions* of the same framework (rather than two
 in-process configurations)? See
 [docs/cross-version-comparison.md](docs/cross-version-comparison.md) for the
 `subprocess_runner()` pattern.
+
+**A note on the `[crewai]` extra:** CrewAI's own memory/knowledge/RAG backend can pull in ChromaDB, which currently has an unpatched critical CVE ([GHSA-f4j7-r4q5-qw2c](https://github.com/advisories/GHSA-f4j7-r4q5-qw2c)) affecting any ChromaDB server run with `trust_remote_code=True` and exposed to the network. `agent-eval` never starts, configures, or exposes a ChromaDB server itself, so this only matters if your own `Crew` does — don't run a network-exposed ChromaDB instance with `trust_remote_code=True` until a fix ships.
 
 ---
 

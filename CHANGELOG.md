@@ -5,6 +5,17 @@ All notable changes documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-07-20
+
+### Fixed
+
+- `agent_regress.__version__` (and `agent-regress --version`) was hardcoded to `0.1.2` and had drifted two releases behind `pyproject.toml`; now derived dynamically from installed package metadata via `importlib.metadata.version()` so it can't drift again
+- The `v0.1.4` GitHub Release/tag was cut against the wrong commit (still `0.1.3` in `pyproject.toml`) and has been deleted and re-cut correctly as `v0.1.5`
+- `.github/workflows/benchmark.yml` pinned `benchmark-action/github-action-benchmark` to a SHA that does not exist upstream, failing every push; repinned to the real `v1.20.4` commit
+- README: clarified that `compare()`'s low-power warning (`n < 50`) and `RegressionGate`'s CI-gate warning (`n < 30`) are two intentionally different, independent thresholds, not a documentation inconsistency
+- README: PyPI 0.1.4's published long description was built before that session's README edits landed and was missing the CLI quickstart section; 0.1.5 republishes with the current README
+- Bumped transitive `json-repair` dependency past a high-severity advisory (GHSA-xf7x-x43h-rpqh); added a README caveat for the `[crewai]` extra's unpatched critical `chromadb` CVE (GHSA-f4j7-r4q5-qw2c, no upstream fix yet)
+
 ## [0.1.4] - 2026-07-20
 
 ### Changed

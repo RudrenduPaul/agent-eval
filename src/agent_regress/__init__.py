@@ -16,6 +16,8 @@ Find out if your latest agent deploy made things worse -- statistically.
 
 from __future__ import annotations
 
+from importlib.metadata import PackageNotFoundError, version
+
 from agent_regress.ci.gate import RegressionGate, assert_no_regression
 from agent_regress.core.compare import compare
 from agent_regress.core.report import Report, Verdict
@@ -38,7 +40,12 @@ from agent_regress.core.scorer import (
     tool_call_trace_scorer,
 )
 
-__version__ = "0.1.2"
+try:
+    __version__ = version("agent-regress-cli")
+except PackageNotFoundError:
+    # Editable/source checkout with no installed dist-info (e.g. running
+    # straight from a git clone without `pip install -e .`).
+    __version__ = "0.0.0+unknown"
 __all__ = [
     "AgentCallable",
     "AsyncAgentCallable",
