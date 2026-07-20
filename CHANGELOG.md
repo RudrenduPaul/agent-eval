@@ -5,6 +5,16 @@ All notable changes documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-07-20
+
+### Changed
+
+- PyPI `Development Status` classifier raised from `3 - Alpha` to `4 - Beta`
+- PyPI/`pyproject.toml` `description` rewritten to lead with the p-value/distributional-shift framing and note the project has no SaaS dependency
+- PyPI keywords expanded for search discoverability (`p-value`, `cohen-d`, `mann-whitney`, `langgraph`, `openai-agents`, `crewai`, `promptfoo-alternative`, `eval`, `benchmark`, `ci-cd`)
+- README rewritten to lead with the regression-detection problem statement, move the framework comparison table above the fold (renamed "Why not DeepEval, Promptfoo, or Braintrust?"), and add a CLI-first quickstart ahead of the Python API example
+- Added `docs/pr-analysis.md`: real merged-PR case studies (LangGraph, OpenAI Agents SDK, CrewAI) where distributional testing catches regressions threshold testing misses
+
 ## [0.1.2] - 2026-07-16
 
 ### Added
