@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784600685316,
+  "lastUpdate": 1784601439237,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -135,6 +135,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00031851929465143375",
             "extra": "mean: 39.30863342307589 msec\nrounds: 26"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "ad3c3c9b99f2bcfe495c1d0ce96aee82537ce293",
+          "message": "Re-record demo GIFs to stop leaking a private repo path\n\ndocs/assets/demo-2-p0-crash.gif and demo-3-cli.gif both showed a\nterminal cd'ing into a private strategy repo's scratchpad path\n(oss-ideas-execution-strategy/<session-uuid>/...) before running the\nactual demo commands. Re-recorded both from a clean path inside this\nrepo (agent-eval/crash-repro, not committed) with the identical real\ncommands and real output -- same crash, same statistics, same numbers,\njust no private path visible.\n\nAlso removed docs/demo.gif and docs/usage.gif: both were unreferenced\nby any current doc, both were broken/failed takes (command not found,\nModuleNotFoundError), and demo.gif leaked the same private path in its\ntraceback. Dead weight, no reason to keep them live in a public repo.",
+          "timestamp": "2026-07-20T19:24:08-07:00",
+          "tree_id": "6f079555b64b33055b31ff05dad3dbdcc07f30b4",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/ad3c3c9b99f2bcfe495c1d0ce96aee82537ce293"
+        },
+        "date": 1784601438972,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1902.9592823114112,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000024130565263413182",
+            "extra": "mean: 525.4973184635667 usec\nrounds: 807"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1306.625164406989,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000029337841851496917",
+            "extra": "mean: 765.330430823173 usec\nrounds: 1142"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 26.241217483637868,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00017461963902954883",
+            "extra": "mean: 38.107987962964295 msec\nrounds: 27"
           }
         ]
       }
