@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784687083927,
+  "lastUpdate": 1784689122406,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -225,6 +225,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00023373723417753145",
             "extra": "mean: 37.77794066665289 msec\nrounds: 27"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "38769913+RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu Paul",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f677652423b05362c90b34f64918b30904ed0a4e",
+          "message": "Rename npm package from agent-regress-npm-cli to agent-regress-cli (#14)\n\nMatches the PyPI package name and the portfolio-wide convention of\nidentical names across registries -- the '-npm-' insertion was the\none cross-registry naming inconsistency found in a portfolio-wide\naudit. The old name will be deprecated pointing at this one once the\nnew name is published.\n\nCo-authored-by: Rudrendu <RudrenduPaul@users.noreply.github.com>",
+          "timestamp": "2026-07-21T19:58:24-07:00",
+          "tree_id": "ce202e00c017c0ec0b2c25674bc0bbe87e0fdb76",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/f677652423b05362c90b34f64918b30904ed0a4e"
+        },
+        "date": 1784689122095,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2250.5137056538333,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00004340354052614739",
+            "extra": "mean: 444.3429948850162 usec\nrounds: 782"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1489.2484227590978,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000021792019905588006",
+            "extra": "mean: 671.4796435018692 usec\nrounds: 1108"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 24.64428767862657,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0002473507446450204",
+            "extra": "mean: 40.57735459999833 msec\nrounds: 25"
           }
         ]
       }
