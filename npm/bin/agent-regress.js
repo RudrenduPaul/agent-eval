@@ -68,7 +68,7 @@ function fail() {
     [
       'agent-regress: could not find the agent-regress Python CLI.',
       '',
-      'This package (npm `agent-regress-npm-cli`) is a thin wrapper around the',
+      'This package (npm `agent-regress-cli`) is a thin wrapper around the',
       'Python `agent-regress-cli` package -- the actual statistics (scipy',
       'Mann-Whitney U, bootstrap CI, Cohen\'s d) run in Python, so it must',
       'be installed separately. Install it with one of:',

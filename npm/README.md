@@ -1,4 +1,4 @@
-# agent-regress-npm-cli
+# agent-regress-cli
 
 Statistical regression testing for LLM agents, from the command line or `npx`.
 
@@ -13,19 +13,19 @@ pip install agent-regress-cli
 ## Install
 
 ```bash
-npm install -g agent-regress-npm-cli
+npm install -g agent-regress-cli
 ```
 
 Or run it without installing:
 
 ```bash
-npx agent-regress-npm-cli --help
+npx agent-regress-cli --help
 ```
 
 ## Usage
 
 ```bash
-npx agent-regress-npm-cli compare \
+npx agent-regress-cli compare \
   --version-a-results version_a_scores.json \
   --version-b-results version_b_scores.json \
   --metric task_success_rate \
