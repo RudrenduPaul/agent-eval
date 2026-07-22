@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784601439237,
+  "lastUpdate": 1784687083927,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -180,6 +180,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00017461963902954883",
             "extra": "mean: 38.107987962964295 msec\nrounds: 27"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "38769913+RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu Paul",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "395defd470abb832102b5c6ac7f28c0cd48da028",
+          "message": "Document all compare flags and CLI exit codes in README (#13)\n\nThe \"In 30 seconds (CLI)\" section only documented 3 of the 8 real\nagent-regress compare flags. Add --p-threshold, --min-effect,\n--n-resamples, and the top-level --version flag with their real\ndefaults from src/agent_regress/cli.py's _build_parser(), plus an\nexit-code table (0/1/2) matching the actual SystemExit/return values\nin cli.py and their test coverage in tests/unit/test_cli.py.\n\nCo-authored-by: Rudrendu <RudrenduPaul@users.noreply.github.com>",
+          "timestamp": "2026-07-21T19:24:25-07:00",
+          "tree_id": "d5edb7a62d2d34dc14d3a01083a2ab02bcc1c223",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/395defd470abb832102b5c6ac7f28c0cd48da028"
+        },
+        "date": 1784687083487,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1867.631718393992,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000041266809422867234",
+            "extra": "mean: 535.4374688281246 usec\nrounds: 802"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1291.4403731872462,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00003583375865474856",
+            "extra": "mean: 774.3292069551937 usec\nrounds: 1150"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 26.470474100847795,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00023373723417753145",
+            "extra": "mean: 37.77794066665289 msec\nrounds: 27"
           }
         ]
       }
