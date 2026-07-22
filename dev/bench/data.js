@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784689122406,
+  "lastUpdate": 1784689683374,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -270,6 +270,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0002473507446450204",
             "extra": "mean: 40.57735459999833 msec\nrounds: 25"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "38769913+RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu Paul",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e5fb67cd770a9d6c4e184f7f97f6ab1b0a2100cd",
+          "message": "Add missing PyPI Environment classifier (#15)\n\nCo-authored-by: Rudrendu <RudrenduPaul@users.noreply.github.com>",
+          "timestamp": "2026-07-21T20:03:58-07:00",
+          "tree_id": "e2f2f28b4eb5b005e2b1c3d17f1b4a354949040f",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/e5fb67cd770a9d6c4e184f7f97f6ab1b0a2100cd"
+        },
+        "date": 1784689682612,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2684.5599400585616,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000026327161577905017",
+            "extra": "mean: 372.5005298180028 usec\nrounds: 872"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1743.607668698145,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00004483579745639276",
+            "extra": "mean: 573.5235156121128 usec\nrounds: 1313"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 38.73963187747264,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0006791611890995603",
+            "extra": "mean: 25.813358349992654 msec\nrounds: 40"
           }
         ]
       }
