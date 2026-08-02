@@ -420,7 +420,7 @@ Agent Evaluation is a statistics library for detecting whether an agent's behavi
 
 **How do I install it, and which platforms does it support?**
 
-`pip install agent-regress-cli` or `uv add agent-regress-cli`. It requires Python 3.10 through 3.13 (per the classifiers in `pyproject.toml`) and has no OS-specific code, so it runs anywhere those Python versions run. A Node/npx wrapper (`npx agent-regress-cli`, also published as `agent-regress-cli` on npm) is also available for users who prefer not to install Python directly.
+`pip install agent-regress-cli` or `uv add agent-regress-cli`. It requires Python 3.10 through 3.13 (per the classifiers in `pyproject.toml`) and has no OS-specific code, so it runs anywhere those Python versions run. A Node/npx wrapper (`npx agent-regress-cli`, also published as `agent-regress-cli` on npm) is also available -- it shells out to this same Python package, so a Python toolchain (or `uv`/`pipx`, which can run it ephemerally without a manual `pip install` step) still needs to be available; it prints an actionable error if neither is found.
 
 **How does it compare to DeepEval, Promptfoo, or Braintrust?**
 
