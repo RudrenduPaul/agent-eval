@@ -19,7 +19,7 @@ p=0.003, Cohen's d=-0.61 -> REGRESSED (deploy blocked)
 p=0.410, Cohen's d=0.021 -> STABLE (safe to ship)
 ```
 
-![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](docs/assets/demo-1-comparison.gif)
+![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](https://raw.githubusercontent.com/RudrenduPaul/agent-eval/main/docs/assets/demo-1-comparison.gif)
 
 [![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
 [![npm](https://img.shields.io/npm/v/agent-regress-cli)](https://www.npmjs.com/package/agent-regress-cli)
