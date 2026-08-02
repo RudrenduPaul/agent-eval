@@ -22,6 +22,7 @@ p=0.410, Cohen's d=0.021 -> STABLE (safe to ship)
 ![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](docs/assets/demo-1-comparison.gif)
 
 [![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
+[![npm](https://img.shields.io/npm/v/agent-regress-cli)](https://www.npmjs.com/package/agent-regress-cli)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
 
@@ -37,9 +38,9 @@ p=0.410, Cohen's d=0.021 -> STABLE (safe to ship)
 pip install agent-regress-cli
 # or
 uv add agent-regress-cli
+# or, from Node/npx (thin wrapper around the same Python CLI)
+npx agent-regress-cli
 ```
-
-*A Node/npx wrapper (`agent-regress-cli` on npm) is in progress and not published yet &mdash; use pip/uv for now.*
 
 ---
 
@@ -419,7 +420,7 @@ Agent Evaluation is a statistics library for detecting whether an agent's behavi
 
 **How do I install it, and which platforms does it support?**
 
-`pip install agent-regress-cli` or `uv add agent-regress-cli`. It requires Python 3.10 through 3.13 (per the classifiers in `pyproject.toml`) and has no OS-specific code, so it runs anywhere those Python versions run. A Node/npx wrapper is planned but not published yet.
+`pip install agent-regress-cli` or `uv add agent-regress-cli`. It requires Python 3.10 through 3.13 (per the classifiers in `pyproject.toml`) and has no OS-specific code, so it runs anywhere those Python versions run. A Node/npx wrapper (`npx agent-regress-cli`, also published as `agent-regress-cli` on npm) is also available for users who prefer not to install Python directly.
 
 **How does it compare to DeepEval, Promptfoo, or Braintrust?**
 
