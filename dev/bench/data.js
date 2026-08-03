@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785794701550,
+  "lastUpdate": 1785794704005,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -720,6 +720,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0015121231466091948",
             "extra": "mean: 40.25212630769231 msec\nrounds: 26"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "82920c1ab14a012047632178995bcf1511047a73",
+          "message": "chore(deps): bump aiohttp from 3.14.1 to 3.14.3 (#29)\n\nBumps [aiohttp](https://github.com/aio-libs/aiohttp) from 3.14.1 to 3.14.3.\n- [Changelog](https://github.com/aio-libs/aiohttp/blob/master/CHANGES.rst)\n- [Commits](https://github.com/aio-libs/aiohttp/compare/v3.14.1...v3.14.3)\n\n---\nupdated-dependencies:\n- dependency-name: aiohttp\n  dependency-version: 3.14.3\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-08-03T15:04:46-07:00",
+          "tree_id": "2e6cc4ac6e1cfe9454d6cc95fa09dd26d8870ea6",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/82920c1ab14a012047632178995bcf1511047a73"
+        },
+        "date": 1785794703749,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1848.5245203936356,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000024509686961862963",
+            "extra": "mean: 540.971996296297 usec\nrounds: 810"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1288.9981207973708,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00002014304139509111",
+            "extra": "mean: 775.796321084939 usec\nrounds: 1143"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 25.209827185073184,
+            "unit": "iter/sec",
+            "range": "stddev: 0.004228939033818822",
+            "extra": "mean: 39.66707080769292 msec\nrounds: 26"
           }
         ]
       }
