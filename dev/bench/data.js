@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785716148929,
+  "lastUpdate": 1785716255663,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -585,6 +585,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00032911565232949256",
             "extra": "mean: 40.55011276000073 msec\nrounds: 25"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "2e251f804e1ba862a881ef688b27cdd4c4f3a862",
+          "message": "Bump github/codeql-action to v4.37.3 across all steps\n\nDependabot PR #18 only bumped the analyze step, leaving init/autobuild/\nupload-sarif pinned to v4.37.0. CodeQL requires all steps in a job to\nshare the same config version, which broke the CodeQL Security Analysis\ncheck with a 'configuration error'.",
+          "timestamp": "2026-08-02T17:17:13-07:00",
+          "tree_id": "515ff9220374d16867c5e996e932c9b9a7927927",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/2e251f804e1ba862a881ef688b27cdd4c4f3a862"
+        },
+        "date": 1785716255265,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 3056.5414235212556,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014268532281224307",
+            "extra": "mean: 327.1671675393036 usec\nrounds: 955"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 2012.7116321951403,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001650268679849455",
+            "extra": "mean: 496.8421625850901 usec\nrounds: 1470"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 31.107642768802005,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0009301086514006332",
+            "extra": "mean: 32.146440906249076 msec\nrounds: 32"
           }
         ]
       }
