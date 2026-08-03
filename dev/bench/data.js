@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785716146385,
+  "lastUpdate": 1785716148929,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -540,6 +540,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000367384528186007",
             "extra": "mean: 26.54733916216151 msec\nrounds: 37"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "38769913+RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu Paul",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6abad395a31c73df49ed3b6ce9b1ee883d0e24d2",
+          "message": "Merge pull request #17 from RudrenduPaul/dependabot/github_actions/astral-sh/setup-uv-9.0.0\n\nchore(deps): bump astral-sh/setup-uv from 7.6.0 to 9.0.0",
+          "timestamp": "2026-08-02T17:15:29-07:00",
+          "tree_id": "41e75339b911d221ff3171c467ead59466a3647c",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/6abad395a31c73df49ed3b6ce9b1ee883d0e24d2"
+        },
+        "date": 1785716148362,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2277.9076171987313,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001832761001601623",
+            "extra": "mean: 438.9993661067586 usec\nrounds: 773"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1501.9126058994964,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00002005559156124868",
+            "extra": "mean: 665.8177020899957 usec\nrounds: 1148"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 24.66084387776144,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00032911565232949256",
+            "extra": "mean: 40.55011276000073 msec\nrounds: 25"
           }
         ]
       }
