@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784689683374,
+  "lastUpdate": 1785716055523,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -315,6 +315,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0006791611890995603",
             "extra": "mean: 25.813358349992654 msec\nrounds: 40"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "8ace1afcea4bde98c2bcfb15770b824623d21ec8",
+          "message": "Merge remote-tracking branch 'origin/main'\n\n# Conflicts:\n#\tREADME.md\n#\tdocs/assets/demo-2-p0-crash.gif\n#\tdocs/assets/demo-3-cli.gif\n#\tnpm/README.md\n#\tnpm/bin/agent-regress.js\n#\tnpm/package.json\n#\tpyproject.toml\n#\tuv.lock",
+          "timestamp": "2026-08-02T17:13:49-07:00",
+          "tree_id": "205e9b786926c2075075de1b5f1c04cbebb50b2c",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/8ace1afcea4bde98c2bcfb15770b824623d21ec8"
+        },
+        "date": 1785716054708,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1860.2647177887854,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000022913530431061747",
+            "extra": "mean: 537.5579026132667 usec\nrounds: 842"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1287.2061370861716,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00002829644583579483",
+            "extra": "mean: 776.876345744967 usec\nrounds: 1128"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 24.785156236276745,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000567365537116612",
+            "extra": "mean: 40.34672973077136 msec\nrounds: 26"
           }
         ]
       }
