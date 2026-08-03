@@ -19,10 +19,10 @@ p=0.003, Cohen's d=-0.61 -> REGRESSED (deploy blocked)
 p=0.410, Cohen's d=0.021 -> STABLE (safe to ship)
 ```
 
-![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](docs/assets/demo-1-comparison.gif)
+![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](https://raw.githubusercontent.com/RudrenduPaul/agent-eval/main/docs/assets/demo-1-comparison.gif)
 
 [![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
-[![npm](https://img.shields.io/npm/v/agent-regress-npm-cli)](https://www.npmjs.com/package/agent-regress-npm-cli)
+[![npm](https://img.shields.io/npm/v/agent-regress-cli)](https://www.npmjs.com/package/agent-regress-cli)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
 
@@ -38,12 +38,8 @@ p=0.410, Cohen's d=0.021 -> STABLE (safe to ship)
 pip install agent-regress-cli
 # or
 uv add agent-regress-cli
-```
-
-Prefer Node/npx? A thin CLI wrapper is also published as [`agent-regress-npm-cli`](https://www.npmjs.com/package/agent-regress-npm-cli) on npm (it shells out to this same Python package, so Python still needs to be installed):
-
-```bash
-npx agent-regress-npm-cli --help
+# or, from Node/npx (thin wrapper around the same Python CLI)
+npx agent-regress-cli
 ```
 
 ---
@@ -165,6 +161,29 @@ agent-regress compare \
 ```
 
 Add `--json --fail-on-regression` to get clean, parseable output and a non-zero exit code on `REGRESSED`, for wiring straight into CI.
+
+**All `agent-regress compare` flags:**
+
+| Flag | Default | Description |
+|---|---|---|
+| `--version-a-results PATH` | *(required)* | Path to a JSON array of per-run scores for version A (baseline). |
+| `--version-b-results PATH` | *(required)* | Path to a JSON array of per-run scores for version B (candidate). |
+| `--metric NAME` | `accuracy` | Name of the metric being compared, shown in the report. |
+| `--p-threshold P` | `0.05` | Significance threshold for the Mann-Whitney U p-value. |
+| `--min-effect D` | `0.2` | Minimum \|Cohen's d\| to call a statistically significant difference REGRESSED/IMPROVED rather than STABLE. |
+| `--n-resamples N` | `1000` | Number of bootstrap resamples used for the confidence interval (minimum: 100). |
+| `--json` | off | Print the report as a single JSON object to stdout instead of the human-readable format. Warnings still go to stderr, so stdout stays clean, parseable JSON. |
+| `--fail-on-regression` | off | Exit with status 1 if the verdict is REGRESSED (useful for CI). Without this flag, the command exits 0 regardless of verdict. |
+
+The top-level `agent-regress --version` flag prints the installed version and exits.
+
+**Exit codes:**
+
+| Code | Meaning |
+|---|---|
+| `0` | Ran successfully. Verdict may be REGRESSED, STABLE, IMPROVED, or INSUFFICIENT_DATA — without `--fail-on-regression`, the exit code doesn't reflect the verdict. |
+| `1` | `--fail-on-regression` was passed and the verdict is REGRESSED. |
+| `2` | Usage or data error: invalid/missing arguments, no subcommand given, a `--version-*-results` file that doesn't exist or isn't valid JSON, an empty/non-numeric scores array, or an out-of-range value for `--p-threshold` (must be in `(0, 1)`), `--min-effect` (must be `>= 0`), or `--n-resamples` (must be `>= 100`). |
 
 ### In your code (Python API)
 
@@ -401,7 +420,7 @@ Agent Evaluation is a statistics library for detecting whether an agent's behavi
 
 **How do I install it, and which platforms does it support?**
 
-`pip install agent-regress-cli` or `uv add agent-regress-cli`. It requires Python 3.10 through 3.13 (per the classifiers in `pyproject.toml`) and has no OS-specific code, so it runs anywhere those Python versions run. Node users can call `npx agent-regress-npm-cli --help`, a thin wrapper that shells out to this same Python package, so Python still needs to be installed alongside Node.
+`pip install agent-regress-cli` or `uv add agent-regress-cli`. It requires Python 3.10 through 3.13 (per the classifiers in `pyproject.toml`) and has no OS-specific code, so it runs anywhere those Python versions run. A Node/npx wrapper (`npx agent-regress-cli`, also published as `agent-regress-cli` on npm) is also available -- it shells out to this same Python package, so a Python toolchain (or `uv`/`pipx`, which can run it ephemerally without a manual `pip install` step) still needs to be available; it prints an actionable error if neither is found.
 
 **How does it compare to DeepEval, Promptfoo, or Braintrust?**
 

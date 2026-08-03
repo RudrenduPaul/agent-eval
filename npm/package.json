@@ -1,7 +1,7 @@
 {
-  "name": "agent-regress-npm-cli",
+  "name": "agent-regress-cli",
   "version": "0.1.5",
-  "description": "Statistical regression testing for LLM agents from the command line. Thin Node wrapper around the agent-regress-cli Python package (agent-regress command) -- compare two agent versions and get a p-value, Cohen's d, and a bootstrap CI on whether behavior actually changed.",
+  "description": "Statistical regression testing for LLM agents from the command line. Thin Node wrapper around the PyPI agent-regress-cli package (agent-regress command) -- compare two agent versions and get a p-value, Cohen's d, and a bootstrap CI on whether behavior actually changed.",
   "keywords": [
     "llm",
     "agent",
@@ -33,7 +33,7 @@
     "Sourav Nandy"
   ],
   "bin": {
-    "agent-regress-npm-cli": "bin/agent-regress.js"
+    "agent-regress-cli": "bin/agent-regress.js"
   },
   "files": [
     "bin/"
