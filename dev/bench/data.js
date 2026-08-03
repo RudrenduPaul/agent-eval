@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785716139190,
+  "lastUpdate": 1785716142513,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -405,6 +405,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00022265519165435194",
             "extra": "mean: 20.53862012244887 msec\nrounds: 49"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "38769913+RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu Paul",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2baa97abe4c6bb1a3edbefe14601429cd6a73d81",
+          "message": "Merge pull request #26 from RudrenduPaul/fix/remove-old-npm-name-refs\n\nRemove remaining literal references to the old npm package name",
+          "timestamp": "2026-08-02T17:15:18-07:00",
+          "tree_id": "9a62e8c55b2b679a80a8207b931cfeae77caef66",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/2baa97abe4c6bb1a3edbefe14601429cd6a73d81"
+        },
+        "date": 1785716142200,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2279.531997118842,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001907227379350888",
+            "extra": "mean: 438.6865379665322 usec\nrounds: 777"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1492.9770797282158,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00002062351285287793",
+            "extra": "mean: 669.8026470587491 usec\nrounds: 1122"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 24.70317513924353,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00029059655056022047",
+            "extra": "mean: 40.48062624999963 msec\nrounds: 24"
           }
         ]
       }
