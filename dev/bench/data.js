@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785794660799,
+  "lastUpdate": 1785794701550,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -675,6 +675,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0011762739266931747",
             "extra": "mean: 30.386825147059096 msec\nrounds: 34"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8a8cef64ef583edb0b9b9673db4e24c8d188e42b",
+          "message": "chore(deps): bump cryptography from 49.0.0 to 50.0.0 (#28)\n\nBumps [cryptography](https://github.com/pyca/cryptography) from 49.0.0 to 50.0.0.\n- [Changelog](https://github.com/pyca/cryptography/blob/main/CHANGELOG.rst)\n- [Commits](https://github.com/pyca/cryptography/compare/49.0.0...50.0.0)\n\n---\nupdated-dependencies:\n- dependency-name: cryptography\n  dependency-version: 50.0.0\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-08-03T15:04:43-07:00",
+          "tree_id": "4ee4af77154efe792b490d74820cf69364d7b129",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/8a8cef64ef583edb0b9b9673db4e24c8d188e42b"
+        },
+        "date": 1785794701265,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2280.5502860986226,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001985330698410153",
+            "extra": "mean: 438.4906599497604 usec\nrounds: 794"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1495.5020350608088,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000020169429413043866",
+            "extra": "mean: 668.6717747992492 usec\nrounds: 1119"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 24.84340808124953,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0015121231466091948",
+            "extra": "mean: 40.25212630769231 msec\nrounds: 26"
           }
         ]
       }
