@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785716144088,
+  "lastUpdate": 1785716146385,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -495,6 +495,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0007262628293745777",
             "extra": "mean: 30.966658250002332 msec\nrounds: 32"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "38769913+RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu Paul",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "814dd2a9cd9536e22d275bbac00fed3dcbd7b998",
+          "message": "Merge pull request #19 from RudrenduPaul/dependabot/github_actions/ossf/scorecard-action-2.4.4\n\nchore(deps): bump ossf/scorecard-action from 2.4.3 to 2.4.4",
+          "timestamp": "2026-08-02T17:15:27-07:00",
+          "tree_id": "26bbd803faa8186e65b3f31dd91297116593fe74",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/814dd2a9cd9536e22d275bbac00fed3dcbd7b998"
+        },
+        "date": 1785716145801,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2553.1968150239154,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00003799881376317474",
+            "extra": "mean: 391.66584969699375 usec\nrounds: 825"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1781.3483468724824,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000021006457443160972",
+            "extra": "mean: 561.3725141158957 usec\nrounds: 1346"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 37.66855856594929,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000367384528186007",
+            "extra": "mean: 26.54733916216151 msec\nrounds: 37"
           }
         ]
       }
