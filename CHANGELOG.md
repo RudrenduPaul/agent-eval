@@ -9,7 +9,7 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- `npm/`: the `agent-regress-npm-cli` wrapper source is now tracked in this repo (previously it existed only on the npm registry, unrecoverable from source control); republished in sync at 0.1.5 with the Python package, added Sourav Nandy as a listed contributor for author parity with PyPI
+- `npm/`: the npm wrapper source (published at the time under an interim package name, later reclaimed as `agent-regress-cli`) is now tracked in this repo (previously it existed only on the npm registry, unrecoverable from source control); republished in sync at 0.1.5 with the Python package, added Sourav Nandy as a listed contributor for author parity with PyPI
 - `release.yml`'s `PYPI_TOKEN` repo secret is now configured, so the tag-triggered PyPI publish step is functional for the first time
 
 ### Fixed
