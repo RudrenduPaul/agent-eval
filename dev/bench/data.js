@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785716255663,
+  "lastUpdate": 1785794660799,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -630,6 +630,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0009301086514006332",
             "extra": "mean: 32.146440906249076 msec\nrounds: 32"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "ed19d6f1a409137f1f74314d8cc85b05283c162d",
+          "message": "Prevent uv run from re-dirtying uv.lock in Benchmark workflow\n\nuv run performs its own implicit sync before executing, which was\nstill rewriting uv.lock even after 'uv sync --frozen'. Freeze the\nrun step too and discard any residual drift before the gh-pages\nbranch switch as a safety net.",
+          "timestamp": "2026-08-03T15:03:58-07:00",
+          "tree_id": "3595fbb6021183571f5a75e664cba98de5ebc949",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/ed19d6f1a409137f1f74314d8cc85b05283c162d"
+        },
+        "date": 1785794659847,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 3063.8088102867864,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001405469136522667",
+            "extra": "mean: 326.3911235722295 usec\nrounds: 963"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 2023.955705180127,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001883981413971979",
+            "extra": "mean: 494.08195912617686 usec\nrounds: 1419"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 32.908999053386864,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0011762739266931747",
+            "extra": "mean: 30.386825147059096 msec\nrounds: 34"
           }
         ]
       }
