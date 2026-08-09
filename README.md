@@ -2,6 +2,22 @@
 
 # Agent Evaluation
 
+[![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
+[![npm](https://img.shields.io/npm/v/agent-regress-cli)](https://www.npmjs.com/package/agent-regress-cli)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval/badge)](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval)
+
+**Statistical regression testing for LLM agents: run version A and version B 50x each and get a p-value, an effect size, and a 95% confidence interval on whether behavior actually shifted.**
+
+![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](https://raw.githubusercontent.com/RudrenduPaul/agent-eval/main/docs/assets/demo-1-comparison.gif)
+
+```bash
+pip install agent-regress-cli
+```
+
+(`uv add` and the npm/npx wrapper are covered in [Install](#install) below.)
+
 ## The test that every eval framework skips
 
 You changed a prompt. Your evals still pass.
@@ -21,16 +37,8 @@ p=0.003, Cohen's d=-0.61 -> REGRESSED (deploy blocked)
 p=0.410, Cohen's d=0.021 -> STABLE (safe to ship)
 ```
 
-[![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
-[![npm](https://img.shields.io/npm/v/agent-regress-cli)](https://www.npmjs.com/package/agent-regress-cli)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
-
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval/badge)](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval)
-
-![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](https://raw.githubusercontent.com/RudrenduPaul/agent-eval/main/docs/assets/demo-1-comparison.gif)
-
-> **Market context:** Promptfoo, one of the most widely used open-source LLM eval frameworks, was [acquired by OpenAI in March 2026](https://techcrunch.com/2026/03/09/openai-acquires-promptfoo-to-secure-its-ai-agents/), staying open source but folding its team into OpenAI's Frontier platform. agent-eval is Apache 2.0-licensed, self-hostable, and has no commercial dependency. The statistical core (Mann-Whitney U, bootstrap CI, Cohen's d) will never be paywalled.
+> [!NOTE]
+> Promptfoo, one of the most widely used open-source LLM eval frameworks, was [acquired by OpenAI in March 2026](https://techcrunch.com/2026/03/09/openai-acquires-promptfoo-to-secure-its-ai-agents/), staying open source but folding its team into OpenAI's Frontier platform. agent-eval is Apache 2.0-licensed, self-hostable, and has no commercial dependency. The statistical core (Mann-Whitney U, bootstrap CI, Cohen's d) will never be paywalled.
 
 ---
 
@@ -43,94 +51,6 @@ uv add agent-regress-cli
 # or, from Node/npx (thin wrapper around the same Python CLI)
 npx agent-regress-cli
 ```
-
----
-
-## Why not DeepEval, Promptfoo, or Braintrust?
-
-| Capability | Agent Evaluation | DeepEval | Braintrust | Promptfoo |
-|---|---|---|---|---|
-| Statistical version comparison (p-values) | **Yes** | No | No | No |
-| Effect size reporting (Cohen's d) | **Yes** | No | No | No |
-| Bootstrap 95% confidence intervals | **Yes** | No | No | No |
-| Distributional shift detection | **Yes** | No | No | No |
-| Tau-bench pass^k harness (k=1,4,8) | **Yes** | No | No | No |
-| GAIA Level 1-3 split harness | **Yes** | No | No | No |
-| SWE-bench scaffold score harness | **Yes** | No | No | No |
-| Self-hostable, zero SaaS required | **Yes** | Partial | No | Yes |
-| Sample size warnings | **Yes** | No | No | No |
-| Core license | Apache 2.0 | MIT | Proprietary | MIT† |
-| Requires cloud account | No | Optional | Yes | No |
-| Test type | Distributional | Threshold | Threshold | Threshold |
-
-†Promptfoo acquired by OpenAI, March 2026; remains open source under its current license.
-
-DeepEval tests whether an individual agent response clears a quality bar. Agent Evaluation tests whether behavior changed significantly between two agent versions, a different statistical question that threshold testing cannot answer. The scipy Mann-Whitney U call at the core is one line, so any SaaS eval platform can add it. What accumulates over time through production use is version-specific regression history and a community-maintained benchmark leaderboard with independent result verification.
-
----
-
-## Real regressions statistical testing catches that threshold testing misses
-
-**LangGraph**
-
-- [#5243](https://github.com/langchain-ai/langgraph/pull/5243): a new typed `context=` API replaced untyped `config['configurable']`. A single run on either invocation style still clears a threshold check; only a version-A-vs-B comparison shows whether the switch changed measured behavior.
-- [#4486](https://github.com/langchain-ai/langgraph/pull/4486): node/task-level result caching can silently mask repeated-sampling variance. Threshold checks don't care whether a result came from cache; a statistical comparison depends on genuinely independent samples, so `agent-eval` added cache-busting to protect that assumption.
-
-**OpenAI Agents SDK**
-
-- [#2463](https://github.com/openai/openai-agents-python/pull/2463): agent-as-tool calls were silently dropping the parent run's `RunConfig`. The nested call still returns a normal-looking response, so a single-response check clears; only inspecting config propagation across runs reveals the regression.
-- [#2214](https://github.com/openai/openai-agents-python/pull/2214): image/audio/file tool outputs were silently downgraded to text-only. A text-only threshold scorer has no way to notice a dropped attachment.
-
-**CrewAI**
-
-- [#6134](https://github.com/crewAIInc/crewAI/pull/6134): a security fix for file tools leaking absolute filesystem paths in responses. A quality scorer checks whether the answer is correct, not whether it also leaks a path, so the leak clears the bar.
-- [#6236](https://github.com/crewAIInc/crewAI/pull/6236): tools gained an optional Pydantic `output_schema`, moving from unstructured `str()` output to structured JSON. Both the old and new format can look "reasonable" to a threshold scorer even though the schema changed underneath.
-
-These are the regressions that motivated this project. Full detail on all 14 individually-documented PRs (drawn from a 29-PR, 239-row validation campaign across LangGraph, CrewAI, and the OpenAI Agents SDK) is in [docs/pr-analysis.md](docs/pr-analysis.md).
-
----
-
-## The problem this solves
-
-You changed a prompt. Or switched from GPT-4o to GPT-4o-mini to cut costs. Or a dependency updated silently. Your evals still pass, because they test individual responses against fixed thresholds. They don't detect whether behavior shifted across the whole distribution.
-
-A 3-point drop in accuracy might be noise from LLM variance. Or it might be a real regression. Without statistical testing you cannot tell which. Teams either ignore small drops and miss real problems, or escalate everything and drown in false alarms.
-
-Agent Evaluation answers the distributional question with a p-value and effect size:
-
-```
-============================================================
-agent-regress Report -- tool_accuracy
-============================================================
-Verdict:    REGRESSED
-p-value:    0.0031
-Cohen's d:  -0.610
-95% CI:     [-0.221, -0.067]
-
-Version A:  0.8400 +/- 0.0601  (n=50)
-Version B:  0.7000 +/- 0.0903  (n=50)
-Delta:      -0.1400
-============================================================
-```
-
-When CI fails, the assertion error gives the deploy-blocking message:
-
-```
-AssertionError: REGRESSED: tool_accuracy dropped 16.7%
-(p=0.003, Cohen's d=-0.61, 95% CI [-0.22, -0.07])
-Version A: 0.840 +/- 0.060  (n=50)
-Version B: 0.700 +/- 0.090  (n=50)
-```
-
-When nothing changed:
-
-```
-Verdict:    STABLE
-p-value:    0.4100
-Cohen's d:  0.021
-```
-
-DeepEval, Promptfoo, and Braintrust test whether individual responses meet thresholds. None of them answer whether a version's behavior distribution shifted significantly from the last. Agent Evaluation addresses that specific statistical question, which threshold testing cannot answer.
 
 ---
 
@@ -247,6 +167,94 @@ report = compare(..., scorer=my_scorer)
 
 ---
 
+## Why not DeepEval, Promptfoo, or Braintrust?
+
+| Capability | Agent Evaluation | DeepEval | Braintrust | Promptfoo |
+|---|---|---|---|---|
+| Statistical version comparison (p-values) | **Yes** | No | No | No |
+| Effect size reporting (Cohen's d) | **Yes** | No | No | No |
+| Bootstrap 95% confidence intervals | **Yes** | No | No | No |
+| Distributional shift detection | **Yes** | No | No | No |
+| Tau-bench pass^k harness (k=1,4,8) | **Yes** | No | No | No |
+| GAIA Level 1-3 split harness | **Yes** | No | No | No |
+| SWE-bench scaffold score harness | **Yes** | No | No | No |
+| Self-hostable, zero SaaS required | **Yes** | Partial | No | Yes |
+| Sample size warnings | **Yes** | No | No | No |
+| Core license | Apache 2.0 | MIT | Proprietary | MIT† |
+| Requires cloud account | No | Optional | Yes | No |
+| Test type | Distributional | Threshold | Threshold | Threshold |
+
+†Promptfoo acquired by OpenAI, March 2026; remains open source under its current license.
+
+DeepEval tests whether an individual agent response clears a quality bar. Agent Evaluation tests whether behavior changed significantly between two agent versions, a different statistical question that threshold testing cannot answer. The scipy Mann-Whitney U call at the core is one line, so any SaaS eval platform can add it. What accumulates over time through production use is version-specific regression history and a community-maintained benchmark leaderboard with independent result verification.
+
+---
+
+## Real regressions statistical testing catches that threshold testing misses
+
+**LangGraph**
+
+- [#5243](https://github.com/langchain-ai/langgraph/pull/5243): a new typed `context=` API replaced untyped `config['configurable']`. A single run on either invocation style still clears a threshold check; only a version-A-vs-B comparison shows whether the switch changed measured behavior.
+- [#4486](https://github.com/langchain-ai/langgraph/pull/4486): node/task-level result caching can silently mask repeated-sampling variance. Threshold checks don't care whether a result came from cache; a statistical comparison depends on genuinely independent samples, so `agent-eval` added cache-busting to protect that assumption.
+
+**OpenAI Agents SDK**
+
+- [#2463](https://github.com/openai/openai-agents-python/pull/2463): agent-as-tool calls were silently dropping the parent run's `RunConfig`. The nested call still returns a normal-looking response, so a single-response check clears; only inspecting config propagation across runs reveals the regression.
+- [#2214](https://github.com/openai/openai-agents-python/pull/2214): image/audio/file tool outputs were silently downgraded to text-only. A text-only threshold scorer has no way to notice a dropped attachment.
+
+**CrewAI**
+
+- [#6134](https://github.com/crewAIInc/crewAI/pull/6134): a security fix for file tools leaking absolute filesystem paths in responses. A quality scorer checks whether the answer is correct, not whether it also leaks a path, so the leak clears the bar.
+- [#6236](https://github.com/crewAIInc/crewAI/pull/6236): tools gained an optional Pydantic `output_schema`, moving from unstructured `str()` output to structured JSON. Both the old and new format can look "reasonable" to a threshold scorer even though the schema changed underneath.
+
+These are the regressions that motivated this project. Full detail on all 14 individually-documented PRs (drawn from a 29-PR, 239-row validation campaign across LangGraph, CrewAI, and the OpenAI Agents SDK) is in [docs/pr-analysis.md](docs/pr-analysis.md).
+
+---
+
+## The problem this solves
+
+You changed a prompt. Or switched from GPT-4o to GPT-4o-mini to cut costs. Or a dependency updated silently. Your evals still pass, because they test individual responses against fixed thresholds. They don't detect whether behavior shifted across the whole distribution.
+
+A 3-point drop in accuracy might be noise from LLM variance. Or it might be a real regression. Without statistical testing you cannot tell which. Teams either ignore small drops and miss real problems, or escalate everything and drown in false alarms.
+
+Agent Evaluation answers the distributional question with a p-value and effect size:
+
+```
+============================================================
+agent-regress Report -- tool_accuracy
+============================================================
+Verdict:    REGRESSED
+p-value:    0.0031
+Cohen's d:  -0.610
+95% CI:     [-0.221, -0.067]
+
+Version A:  0.8400 +/- 0.0601  (n=50)
+Version B:  0.7000 +/- 0.0903  (n=50)
+Delta:      -0.1400
+============================================================
+```
+
+When CI fails, the assertion error gives the deploy-blocking message:
+
+```
+AssertionError: REGRESSED: tool_accuracy dropped 16.7%
+(p=0.003, Cohen's d=-0.61, 95% CI [-0.22, -0.07])
+Version A: 0.840 +/- 0.060  (n=50)
+Version B: 0.700 +/- 0.090  (n=50)
+```
+
+When nothing changed:
+
+```
+Verdict:    STABLE
+p-value:    0.4100
+Cohen's d:  0.021
+```
+
+DeepEval, Promptfoo, and Braintrust test whether individual responses meet thresholds. None of them answer whether a version's behavior distribution shifted significantly from the last. Agent Evaluation addresses that specific statistical question, which threshold testing cannot answer.
+
+---
+
 ## Add to CI: fail the build on regression
 
 Two patterns. Pick one.
@@ -342,7 +350,8 @@ in-process configurations)? See
 [docs/cross-version-comparison.md](docs/cross-version-comparison.md) for the
 `subprocess_runner()` pattern.
 
-**A note on the `[crewai]` extra:** CrewAI's own memory/knowledge/RAG backend can pull in ChromaDB, which currently has an unpatched critical CVE ([GHSA-f4j7-r4q5-qw2c](https://github.com/advisories/GHSA-f4j7-r4q5-qw2c)) affecting any ChromaDB server run with `trust_remote_code=True` and exposed to the network. `agent-eval` never starts, configures, or exposes a ChromaDB server itself, so this only matters if your own `Crew` does — don't run a network-exposed ChromaDB instance with `trust_remote_code=True` until a fix ships.
+> [!WARNING]
+> The `[crewai]` extra: CrewAI's own memory/knowledge/RAG backend can pull in ChromaDB, which currently has an unpatched critical CVE ([GHSA-f4j7-r4q5-qw2c](https://github.com/advisories/GHSA-f4j7-r4q5-qw2c)) affecting any ChromaDB server run with `trust_remote_code=True` and exposed to the network. `agent-eval` never starts, configures, or exposes a ChromaDB server itself, so this only matters if your own `Crew` does — don't run a network-exposed ChromaDB instance with `trust_remote_code=True` until a fix ships.
 
 ---
 
