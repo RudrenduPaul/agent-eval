@@ -164,6 +164,8 @@ agent-regress compare \
 
 Add `--json --fail-on-regression` to get clean, parseable output and a non-zero exit code on `REGRESSED`, for wiring straight into CI.
 
+![agent-regress compare run from the CLI end to end, from install through a REGRESSED verdict](https://raw.githubusercontent.com/RudrenduPaul/agent-eval/main/docs/assets/demo-3-cli.gif)
+
 **All `agent-regress compare` flags:**
 
 | Flag | Default | Description |
@@ -283,6 +285,8 @@ def test_routing_accuracy():
     report = compare(version_a=prod, version_b=staging, test_suite=routing_suite, n_runs=50)
     gate.check(report)
 ```
+
+![agent-regress catching a P0 regression in CI and failing the build with a deploy-blocking AssertionError](https://raw.githubusercontent.com/RudrenduPaul/agent-eval/main/docs/assets/demo-2-p0-crash.gif)
 
 Both patterns: warn (not fail) when `n < 30` per version, and treat `n < 10` as insufficient data and skip the gate. This CI-gate threshold (30) is intentionally lower than `compare()`'s own general low-power warning (`n < 50`, see [FAQ](#faq)) — it exists to stop a genuinely too-small sample from silently gating a build, not to guarantee 80% statistical power the way the 50-run recommendation does.
 
