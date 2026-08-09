@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786300385239,
+  "lastUpdate": 1786302413672,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -945,6 +945,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00041056378229324176",
             "extra": "mean: 40.9966633199997 msec\nrounds: 25"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "d098aeb35adb3b641c92ef782b33a78d717c913a",
+          "message": "Add traffic-light window dots to demo GIFs",
+          "timestamp": "2026-08-09T12:06:25-07:00",
+          "tree_id": "f1933ab654cbef51e1ac15ab5713d03342e343c6",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/d098aeb35adb3b641c92ef782b33a78d717c913a"
+        },
+        "date": 1786302412969,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2292.4901805321383,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001919625180550378",
+            "extra": "mean: 436.20688476313455 usec\nrounds: 781"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1488.308755192455,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000021519439140640662",
+            "extra": "mean: 671.9035929279935 usec\nrounds: 1103"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 25.323488599564946,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00046334864643174573",
+            "extra": "mean: 39.489029960002426 msec\nrounds: 25"
           }
         ]
       }
