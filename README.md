@@ -21,14 +21,14 @@ p=0.003, Cohen's d=-0.61 -> REGRESSED (deploy blocked)
 p=0.410, Cohen's d=0.021 -> STABLE (safe to ship)
 ```
 
-![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](https://raw.githubusercontent.com/RudrenduPaul/agent-eval/main/docs/assets/demo-1-comparison.gif)
-
 [![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
 [![npm](https://img.shields.io/npm/v/agent-regress-cli)](https://www.npmjs.com/package/agent-regress-cli)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/agent-eval/actions/workflows/ci.yml)
 
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval/badge)](https://api.securityscorecards.dev/projects/github.com/RudrenduPaul/agent-eval)
+
+![agent-eval running the basic-comparison example and reporting a REGRESSED verdict with p-value, Cohen's d, and a 95% confidence interval](https://raw.githubusercontent.com/RudrenduPaul/agent-eval/main/docs/assets/demo-1-comparison.gif)
 
 > **Market context:** Promptfoo, one of the most widely used open-source LLM eval frameworks, was [acquired by OpenAI in March 2026](https://techcrunch.com/2026/03/09/openai-acquires-promptfoo-to-secure-its-ai-agents/), staying open source but folding its team into OpenAI's Frontier platform. agent-eval is Apache 2.0-licensed, self-hostable, and has no commercial dependency. The statistical core (Mann-Whitney U, bootstrap CI, Cohen's d) will never be paywalled.
 
