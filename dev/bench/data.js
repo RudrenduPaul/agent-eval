@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786266575074,
+  "lastUpdate": 1786300385239,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -900,6 +900,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00027343344546577317",
             "extra": "mean: 41.00609299998723 msec\nrounds: 25"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "a6a559d64a11bb77b29ae192590b69b7059aeded",
+          "message": "Update demo GIFs with richer, PH-quality recordings",
+          "timestamp": "2026-08-09T11:32:45-07:00",
+          "tree_id": "e12567d2559e27fe57f9774c65fcce5b4e86ca4c",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/a6a559d64a11bb77b29ae192590b69b7059aeded"
+        },
+        "date": 1786300384750,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2296.1162160081217,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000020086246770702834",
+            "extra": "mean: 435.5180251888708 usec\nrounds: 794"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1504.0156101953105,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000019693805988779762",
+            "extra": "mean: 664.886716082781 usec\nrounds: 1113"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 24.39222900152859,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00041056378229324176",
+            "extra": "mean: 40.9966633199997 msec\nrounds: 25"
           }
         ]
       }
