@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786304755841,
+  "lastUpdate": 1786313831212,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -1125,6 +1125,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0009786109922003108",
             "extra": "mean: 30.478809735294064 msec\nrounds: 34"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "76bb32d90196aa63414817e12017693e1f0045a7",
+          "message": "Improve README structure and searchability per portfolio design study",
+          "timestamp": "2026-08-09T15:16:39-07:00",
+          "tree_id": "869c68a7fe549580985f2177882d40ab09620b91",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/76bb32d90196aa63414817e12017693e1f0045a7"
+        },
+        "date": 1786313830746,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1863.9238164394956,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000018886620679570598",
+            "extra": "mean: 536.5026140983701 usec\nrounds: 837"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1290.5957721822758,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000018544415531669045",
+            "extra": "mean: 774.8359490664488 usec\nrounds: 1178"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 25.672620382993546,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0003780554979900898",
+            "extra": "mean: 38.9520035384637 msec\nrounds: 26"
           }
         ]
       }
