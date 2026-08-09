@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786258965089,
+  "lastUpdate": 1786262896798,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -810,6 +810,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0007868167463764477",
             "extra": "mean: 40.40738649999872 msec\nrounds: 26"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "adaa28e62438529f33d2e25269bc66dcb25afbab",
+          "message": "Re-record demo GIFs to remove leaked local username/path\n\nBoth demo-1-comparison.gif and demo-2-p0-crash.gif were recorded from the\nreal maintainer machine and leaked the absolute macOS path (including the\nreal username) in typed commands and, in demo-2, a full Python traceback.\nRe-recorded from a generic clone path with a real reproduced AttributeError\nfrom the current openai-agents SDK, same content/narrative, same 900x560\ndimensions.",
+          "timestamp": "2026-08-09T01:07:49-07:00",
+          "tree_id": "3c0b3934651fc652d1cb7cd5d7f904fb8d652325",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/adaa28e62438529f33d2e25269bc66dcb25afbab"
+        },
+        "date": 1786262895757,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1822.0290235338312,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00003451450212469463",
+            "extra": "mean: 548.838677695977 usec\nrounds: 816"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1268.9006473828654,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000030273196473919223",
+            "extra": "mean: 788.0837653148978 usec\nrounds: 1159"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 25.189754420045723,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0005335556813989877",
+            "extra": "mean: 39.69868000000076 msec\nrounds: 25"
           }
         ]
       }
