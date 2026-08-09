@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786304108530,
+  "lastUpdate": 1786304755841,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -1080,6 +1080,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0006323624820069183",
             "extra": "mean: 40.16245519999984 msec\nrounds: 25"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "029a8241ac206fc5f40e0442ad57a0db730a1d1f",
+          "message": "Add CodeQL security scanning workflow",
+          "timestamp": "2026-08-09T12:44:56-07:00",
+          "tree_id": "5997c7741cf494aeef6418396ebcceae897091ed",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/029a8241ac206fc5f40e0442ad57a0db730a1d1f"
+        },
+        "date": 1786304754272,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2336.6495749742735,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000021454823502797575",
+            "extra": "mean: 427.9631874244601 usec\nrounds: 827"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1554.1954016397776,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000022012474713779115",
+            "extra": "mean: 643.4197392071387 usec\nrounds: 1135"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 32.80968019043122,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0009786109922003108",
+            "extra": "mean: 30.478809735294064 msec\nrounds: 34"
           }
         ]
       }
