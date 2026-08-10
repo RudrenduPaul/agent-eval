@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786313831212,
+  "lastUpdate": 1786393122954,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -1170,6 +1170,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0003780554979900898",
             "extra": "mean: 38.9520035384637 msec\nrounds: 26"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "1ea8192b2cf508fa4a781cf133dabd759ce53bb4",
+          "message": "Add MCP server wrapper, publish to MCP Registry\n\nExposes the agent-regress CLI as a stdio MCP tool via the mcp[cli]\noptional dependency group. Adds the registry ownership-proof string\nto README.md for registry.modelcontextprotocol.io publishing.",
+          "timestamp": "2026-08-10T13:18:16-07:00",
+          "tree_id": "32147d396dd151568f027dd866cfb59b928711ff",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/1ea8192b2cf508fa4a781cf133dabd759ce53bb4"
+        },
+        "date": 1786393122049,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1870.5823307306048,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000032645551860802204",
+            "extra": "mean: 534.5928824257759 usec\nrounds: 808"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1289.5901259937357,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000026853053343866557",
+            "extra": "mean: 775.4401804444784 usec\nrounds: 1125"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 24.2043402591704,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0007974819189417632",
+            "extra": "mean: 41.31490423999992 msec\nrounds: 25"
           }
         ]
       }
