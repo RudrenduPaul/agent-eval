@@ -171,6 +171,43 @@ report = compare(..., scorer=my_scorer)
 
 ---
 
+## MCP Server
+
+agent-eval ships a [Model Context Protocol](https://modelcontextprotocol.io) server so an AI agent
+(Claude, Cursor, or any MCP-compatible client) can run statistical regression tests directly,
+without a human invoking the CLI by hand.
+
+Install the extra:
+
+```bash
+pip install "agent-regress-cli[mcp]"
+```
+
+Add it to your MCP client's config (for Claude Desktop, `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "agent-eval": {
+      "command": "uvx",
+      "args": ["--from", "agent-regress-cli", "agent-regress-mcp"]
+    }
+  }
+}
+```
+
+The server exposes one tool, `run`, that shells out to the `agent-regress` CLI with the given
+subcommand and arguments plus `--json`, and returns the parsed JSON result:
+
+```
+run(["compare", "--version-a-results", "a.json", "--version-b-results", "b.json", "--metric", "accuracy"])
+```
+
+Transport is stdio, so there is nothing to host: the MCP client spawns the server as a local
+subprocess. Source: [`src/agent_regress/mcp_server.py`](src/agent_regress/mcp_server.py).
+
+---
+
 ## Why not DeepEval, Promptfoo, or Braintrust?
 
 | Capability | Agent Evaluation | DeepEval | Braintrust | Promptfoo |
