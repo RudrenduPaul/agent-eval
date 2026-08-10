@@ -2,6 +2,10 @@
 
 # Agent Evaluation
 
+<!-- mcp-name: io.github.RudrenduPaul/agent-eval -->
+<!-- Ownership-proof string for registry.modelcontextprotocol.io publishing. Do not remove. -->
+
+
 [![PyPI](https://img.shields.io/pypi/v/agent-regress-cli)](https://pypi.org/project/agent-regress-cli/)
 [![npm](https://img.shields.io/npm/v/agent-regress-cli)](https://www.npmjs.com/package/agent-regress-cli)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)

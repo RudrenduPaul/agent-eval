@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-regress-cli"
-version = "0.1.7"
+version = "0.1.8"
 description = "Statistical regression testing for LLM agents. Get a p-value on whether behavior actually shifted between versions, not just whether one run looked different. Apache 2.0, self-hostable, no SaaS dependency -- a Promptfoo alternative for the statistical testing gap threshold-based eval tools don't cover."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -43,6 +43,7 @@ langgraph = ["langgraph>=0.2"]
 openai-agents = ["openai-agents>=0.1"]
 crewai = ["crewai>=0.80"]
 langchain = ["langchain-core>=0.3"]
+mcp = ["mcp[cli]>=2.0.0"]
 dev = [
     "pytest>=8",
     "pytest-benchmark>=4.0",
@@ -61,6 +62,7 @@ Issues = "https://github.com/RudrenduPaul/agent-eval/issues"
 
 [project.scripts]
 agent-regress = "agent_regress.cli:main"
+agent-regress-mcp = "agent_regress.mcp_server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agent_regress"]
