@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786403210495,
+  "lastUpdate": 1786458479148,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -1305,6 +1305,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00214589116929835",
             "extra": "mean: 27.374214411763962 msec\nrounds: 34"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "d5aa9cd86d85e9992fe1deceaf371b1c21001259",
+          "message": "Improve MCP tool description quality, bump to 0.1.9\n\nRewrites the run tool's description from a thin, dynamically-pulled --help\ndump into a full docstring covering purpose, usage guidelines, side effects,\nexact args shape with real example argv lists, and the JSON response shape.\nRemoves the now-unused --help capture helper.",
+          "timestamp": "2026-08-11T07:27:26-07:00",
+          "tree_id": "56d2a76ca088da3e783ea037e52892118fce3bb0",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/d5aa9cd86d85e9992fe1deceaf371b1c21001259"
+        },
+        "date": 1786458478102,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1827.1712605295677,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00003294300655076336",
+            "extra": "mean: 547.2940723192913 usec\nrounds: 802"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1265.8559101878136,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000028073224338956154",
+            "extra": "mean: 789.9793269927785 usec\nrounds: 1104"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 25.623221646171274,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0011755176950001835",
+            "extra": "mean: 39.02709869230765 msec\nrounds: 26"
           }
         ]
       }
