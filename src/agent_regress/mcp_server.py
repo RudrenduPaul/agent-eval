@@ -26,35 +26,11 @@ from __future__ import annotations
 
 import json
 import subprocess
-import sys
 from typing import Any
 
 from mcp.server import MCPServer
 
 _CLI_BIN = "agent-regress"
-
-
-def _cli_help_text() -> str:
-    """Capture ``agent-regress --help`` to use as the live tool description.
-
-    Falls back to a short static description if the CLI can't be invoked
-    (e.g. not on PATH yet at import time) -- this must never raise, since
-    it runs at server-build time before any tool call has happened.
-    """
-    try:
-        proc = subprocess.run(
-            [_CLI_BIN, "--help"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            check=False,
-        )
-        help_text = proc.stdout.strip() or proc.stderr.strip()
-        if help_text:
-            return help_text
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        print(f"agent-regress-mcp: warning: could not capture --help: {exc}", file=sys.stderr)
-    return "Run the agent-regress CLI (statistical regression testing for LLM agents)."
 
 
 def _run_impl(args: list[str]) -> dict[str, Any]:
@@ -96,14 +72,51 @@ def _run_impl(args: list[str]) -> dict[str, Any]:
         }
 
 
+_TOOL_DESCRIPTION = """\
+Run the agent-regress CLI as a subprocess and return its parsed --json output, \
+so an agent can get a statistically grounded verdict on whether an LLM agent's \
+behavior actually shifted between two versions instead of eyeballing two numbers.
+
+Call this after you already have two pre-computed sets of per-run scores (one \
+JSON array of numbers per agent version, produced by whatever harness ran each \
+version) and you need to know whether the difference between them is a real \
+regression/improvement or just run-to-run noise. Do not call it to generate \
+those scores in the first place -- it only compares numbers that already exist \
+on disk. Right now the CLI has one subcommand, `compare`; pass ["--help"] or \
+["compare", "--help"] as `args` to discover any subcommands/flags added since \
+this description was written.
+
+Behavior: this is a read-only, idempotent operation with no network calls -- it \
+spawns a local subprocess, reads the two score files you point it at, and writes \
+nothing to disk itself. No API keys or network access are required, but the \
+paths passed via --version-a-results/--version-b-results must already exist and \
+contain valid JSON arrays of numbers. On a normal run (including a REGRESSED \
+verdict with --fail-on-regression, which legitimately exits 1) the tool returns \
+the CLI's parsed JSON report. On an actual failure (bad args, CLI not on PATH, \
+unparseable output) it instead returns a dict with an "error" key and, where \
+available, the captured "stderr"/"stdout".
+
+Parameters:
+    args: list[str] -- CLI argv, NOT a shell string. Include the subcommand and \
+        its flags exactly as `agent-regress` would take them on the command \
+        line; `--json` is appended automatically if you omit it. Examples:
+        ["compare", "--version-a-results", "a.json", "--version-b-results", "b.json"]
+        ["compare", "--version-a-results", "a.json", "--version-b-results", "b.json",
+         "--metric", "tool_accuracy", "--min-effect", "0.3", "--fail-on-regression"]
+        ["compare", "--help"]
+
+Returns (JSON object) on success: metric, verdict (one of REGRESSED / STABLE / \
+IMPROVED / INSUFFICIENT_DATA), p_value, effect_size, ci_lower, ci_upper, n_a, \
+n_b, mean_a, mean_b, std_a, std_b, mean_delta, p_threshold, min_effect, and \
+warnings (e.g. low sample size). On failure: error (and stderr/stdout when \
+captured).\
+"""
+
+
 def build_app() -> MCPServer:
     app = MCPServer("agent-regress")
-    tool_description = (
-        f"Run the agent-regress CLI with the given arguments and return its "
-        f"--json output, parsed. Real CLI --help output:\n\n{_cli_help_text()}"
-    )
 
-    @app.tool(description=tool_description)
+    @app.tool(description=_TOOL_DESCRIPTION)
     def run(args: list[str]) -> dict[str, Any]:
         return _run_impl(args)
 
