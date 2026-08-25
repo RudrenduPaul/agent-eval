@@ -44,7 +44,7 @@ def _run_impl(args: list[str]) -> dict[str, Any]:
     """
     full_args = [*args] if "--json" in args else [*args, "--json"]
     try:
-        proc = subprocess.run(
+        proc = subprocess.run(  # noqa: S603 -- fixed argv list, shell=True never used
             [_CLI_BIN, *full_args],
             capture_output=True,
             text=True,
@@ -116,7 +116,7 @@ captured).\
 def build_app() -> MCPServer:
     app = MCPServer("agent-regress")
 
-    @app.tool(description=_TOOL_DESCRIPTION)
+    @app.tool(description=_TOOL_DESCRIPTION)  # type: ignore[untyped-decorator]
     def run(args: list[str]) -> dict[str, Any]:
         return _run_impl(args)
 
