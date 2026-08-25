@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786458479148,
+  "lastUpdate": 1787673285609,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -1350,6 +1350,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0011755176950001835",
             "extra": "mean: 39.02709869230765 msec\nrounds: 26"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "essen.gemini@gmail.com",
+            "name": "Sourav Nandy",
+            "username": "Sourav-Nandy-ai"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2e334c4c2d3b600e0d211757f44ea9169647f170",
+          "message": "Fix false SLSA Level 2 supply-chain claim in docs (#30)\n\n* Correct false SLSA Level 2 supply-chain claim\n\nREADME and CHANGELOG claimed SLSA Level 2 via GitHub Actions\nprovenance, but the release workflow only signs artifacts with\nSigstore and attaches a CycloneDX SBOM -- there is no\nslsa-framework/slsa-github-generator step or in-toto attestation\nproducing actual SLSA provenance. Corrected both docs to describe\nonly what CI actually does.\n\nVerified via fresh audit: no leaked local paths/usernames remain in\nthe demo GIFs (re-recorded in prior commits), no eval/exec/shell=True/\npickle patterns, no hardcoded secrets, no pull_request_target risk,\nCI actions are SHA-pinned. Full test suite: 312 passed, 14 skipped\n(missing optional openai-agents extra), 0 failed.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01QyJoCc6YtjnErv6HKa6NPu\n\n* Fix Quality CI: ruff S603 and mypy strict errors in mcp_server.py\n\nMark the subprocess.run call as a reviewed, safe fixed-argv invocation\n(no shell=True), matching the existing noqa convention in runner.py.\nAdd mcp.* to mypy's ignore_missing_imports overrides since the mcp\nextra isn't installed by the dev extra, and silence the resulting\nuntyped-decorator warning on the MCP tool registration.\n\n---------\n\nCo-authored-by: Claude Sonnet 5 <noreply@anthropic.com>\nCo-authored-by: Rudrendu <RudrenduPaul@users.noreply.github.com>",
+          "timestamp": "2026-08-25T08:54:24-07:00",
+          "tree_id": "13b849e6ada3d88744b4de5055e190ed00bc4355",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/2e334c4c2d3b600e0d211757f44ea9169647f170"
+        },
+        "date": 1787673284689,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 2756.729710583625,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000017409028976585846",
+            "extra": "mean: 362.7486569179431 usec\nrounds: 889"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1851.0097909609779,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000025538277637539544",
+            "extra": "mean: 540.245656659026 usec\nrounds: 1299"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 39.59555759146272,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0004509878007853849",
+            "extra": "mean: 25.255358449999754 msec\nrounds: 40"
           }
         ]
       }
