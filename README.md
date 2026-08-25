@@ -453,7 +453,7 @@ Good for verifying the install works and seeing the leaderboard UI before wiring
 
 ## Security
 
-- **Supply chain:** SLSA Level 2 via GitHub Actions provenance. All releases signed with Sigstore. SBOM attached to every GitHub Release.
+- **Supply chain:** Releases are built and published from a GitHub Actions workflow, signed with Sigstore, and ship with a CycloneDX SBOM attached to every GitHub Release. (No SLSA provenance attestation is generated yet — that would require adopting `slsa-framework/slsa-github-generator`.)
 - **Vulnerability scanning:** Trivy scans on every CI run (HIGH/CRITICAL only, exit on unfixed). CodeQL static analysis on every push.
 - **Dependency pinning:** Dependabot keeps all GitHub Actions and Python dependencies current.
 - **Disclosure:** [SECURITY.md](SECURITY.md) — report vulnerabilities privately via GitHub Security Advisories.

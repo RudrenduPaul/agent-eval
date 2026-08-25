@@ -87,5 +87,5 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Sample size warnings: warns (not fails) when n < 30 per version
 - Apache 2.0 license
 - OpenSSF Scorecard CI workflow
-- SLSA Level 2 release signing via Sigstore
+- Release signing via Sigstore (not full SLSA Level 2 provenance)
 - SBOM generation on release (CycloneDX JSON format)
