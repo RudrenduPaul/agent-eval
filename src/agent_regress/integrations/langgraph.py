@@ -62,7 +62,7 @@ def _wire_store_into_config(
     return merged
 
 
-def langgraph_runner(  # noqa: PLR0913
+def langgraph_runner(  # noqa: PLR0913, PLR0917
     graph: Any,
     input_key: str = "messages",
     config: dict[str, Any] | None = None,
@@ -176,7 +176,7 @@ def langgraph_runner(  # noqa: PLR0913
     return _agent
 
 
-def langgraph_async_runner(  # noqa: PLR0913
+def langgraph_async_runner(  # noqa: PLR0913, PLR0917
     graph: Any,
     input_key: str = "messages",
     store: Any = None,

@@ -80,7 +80,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S", "PLR2004", "PLR0913", "PLC0415", "B017", "E501"]
+"tests/*" = ["S", "PLR2004", "PLR0913", "PLR0917", "PLC0415", "B017", "E501"]
 "benchmarks/*" = ["S", "E501", "PLC0415"]
 "examples/*" = ["S", "T201"]
 
@@ -131,3 +131,6 @@ fail_under = 80
 # crewai (crewai extra) pins json-repair~=0.25.2, which is GHSA-xf7x-x43h-rpqh
 # (unbounded CPU DoS via circular $ref). Force the patched release instead.
 override-dependencies = ["json-repair>=0.60.1"]
+# numpy 2.5 stubs use PEP 695 type statements, which mypy cannot parse with
+# python_version = "3.10"; keep the lockfile on 2.4.x until that config can move.
+constraint-dependencies = ["numpy<2.5"]

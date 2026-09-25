@@ -71,7 +71,7 @@ def _load_scores(path: str, flag: str) -> list[float]:
         _fail(f"{flag}: {path} must contain only numbers, got: {raw!r}")
 
 
-def _report_from_scores(  # noqa: PLR0913
+def _report_from_scores(  # noqa: PLR0913, PLR0917
     metric: str,
     scores_a: list[float],
     scores_b: list[float],

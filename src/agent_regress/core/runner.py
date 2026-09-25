@@ -75,7 +75,7 @@ def _clamp_score(score: float) -> float:
     return score
 
 
-def run_suite(  # noqa: PLR0913
+def run_suite(  # noqa: PLR0913, PLR0917
     agent: AgentCallable,
     test_suite: list[dict[str, Any]],
     n_runs: int = 50,
@@ -202,7 +202,7 @@ def run_suite(  # noqa: PLR0913
     return all_scores
 
 
-async def arun_suite(  # noqa: PLR0913
+async def arun_suite(  # noqa: PLR0913, PLR0917
     agent: AsyncAgentCallable,
     test_suite: list[dict[str, Any]],
     n_runs: int = 50,

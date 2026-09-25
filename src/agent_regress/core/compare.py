@@ -39,7 +39,7 @@ def _low_n_warning(n_a: int, n_b: int, min_n: int = _MIN_N_WARN) -> list[str]:
     return warn_msgs
 
 
-def compare(  # noqa: PLR0913
+def compare(  # noqa: PLR0913, PLR0917
     version_a: AgentCallable,
     version_b: AgentCallable,
     test_suite: list[dict[str, Any]],
@@ -121,7 +121,7 @@ def compare(  # noqa: PLR0913
     )
 
 
-async def compare_liveness(  # noqa: PLR0913
+async def compare_liveness(  # noqa: PLR0913, PLR0917
     agent_a: AsyncAgentCallable,
     agent_b: AsyncAgentCallable,
     test_case: dict[str, Any],
