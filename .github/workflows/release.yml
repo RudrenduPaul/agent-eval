@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: read
+
 jobs:
   release:
     name: Build and publish
@@ -23,7 +26,7 @@ jobs:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
       - name: Generate SBOM
         run: |
-          pip install cyclonedx-bom
+          pip install --require-hashes -r .github/requirements/sbom.txt
           uv export --no-dev --format requirements-txt -o /tmp/prod-requirements.txt
           cyclonedx-py requirements --output-format json -o sbom.json /tmp/prod-requirements.txt
       - name: Sign with Sigstore
