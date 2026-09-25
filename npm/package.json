@@ -25,7 +25,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RudrenduPaul/agent-eval.git"
+    "url": "git+https://github.com/RudrenduPaul/agent-eval.git",
+    "directory": "npm"
   },
   "license": "Apache-2.0",
   "author": "Rudrendu Paul",
