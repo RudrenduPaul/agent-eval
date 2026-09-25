@@ -5,6 +5,10 @@ All notable changes documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [npm 0.1.6] - 2026-09-25
+
+- npm 0.1.6: republished through npm Trusted Publishing with provenance, no code changes
+
 ## [0.1.5] - 2026-07-20
 
 ### Added
