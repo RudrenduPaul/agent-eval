@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790297963323,
+  "lastUpdate": 1790298078653,
   "repoUrl": "https://github.com/RudrenduPaul/agent-eval",
   "entries": {
     "Benchmark": [
@@ -1440,6 +1440,51 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0029896581857913876",
             "extra": "mean: 40.87333515384728 msec\nrounds: 26"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "committer": {
+            "email": "RudrenduPaul@users.noreply.github.com",
+            "name": "Rudrendu",
+            "username": "RudrenduPaul"
+          },
+          "distinct": true,
+          "id": "84677f0a4fc0fa74abb7b5031e03f04594a1a7d5",
+          "message": "Bump anyio and httpx2 to patched versions",
+          "timestamp": "2026-09-24T17:57:37-07:00",
+          "tree_id": "15b638dc56777a0fee2d2f2c8d6567662807ac21",
+          "url": "https://github.com/RudrenduPaul/agent-eval/commit/84677f0a4fc0fa74abb7b5031e03f04594a1a7d5"
+        },
+        "date": 1790298078042,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n50",
+            "value": 1857.794855831235,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000020773974527250203",
+            "extra": "mean: 538.272563766234 usec\nrounds: 839"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_mann_whitney_n1000",
+            "value": 1242.4663795172291,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00007596481663567093",
+            "extra": "mean: 804.8507520892103 usec\nrounds: 1077"
+          },
+          {
+            "name": "benchmarks/test_stat_overhead.py::test_bootstrap_n1000",
+            "value": 25.55304273485416,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0009779218049967406",
+            "extra": "mean: 39.13428276922996 msec\nrounds: 26"
           }
         ]
       }
