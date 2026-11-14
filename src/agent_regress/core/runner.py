@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import concurrent.futures
 import json
+import math
 import subprocess
 import warnings
 from collections.abc import Awaitable, Callable
@@ -64,6 +65,8 @@ def _clamp_score(score: float) -> float:
 
     Shared by `run_suite()` and `arun_suite()`.
     """
+    if math.isnan(score):
+        raise ValueError("Score must not be NaN.")
     if not (0.0 <= score <= 1.0):
         warnings.warn(
             f"Score {score:.4f} outside [0.0, 1.0]. Clamping. "
